@@ -202,7 +202,6 @@ input,button,select{font-family:Inter,sans-serif;-webkit-appearance:none}
 .suggest-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}
 .suggest-chip{padding:6px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;font-size:11px;color:var(--text2);cursor:pointer;font-weight:500;transition:all .15s}
 .suggest-chip:hover{border-color:var(--accent);color:var(--accent)}
-@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -240,6 +239,7 @@ input,button,select{font-family:Inter,sans-serif;-webkit-appearance:none}
     <button class="sb" id="sn-gas" onclick="goSeg('gas')"><i class="ti ti-cylinder" aria-hidden="true"></i>Gases</button>
     <button class="sb" id="sn-ref" onclick="goSeg('ref')"><i class="ti ti-temperature" aria-hidden="true"></i>Refrigerants</button>
     <button class="sb" id="sn-nbi" onclick="goSeg('nbi')"><i class="ti ti-ship" aria-hidden="true"></i>NBI</button>
+    <button class="sb" id="sn-wsr" onclick="goSeg('wsr')"><i class="ti ti-clipboard-text" aria-hidden="true"></i>Report</button>
     <button class="sb" id="sn-ai" onclick="goSeg('ai')"><i class="ti ti-message-chatbot" aria-hidden="true"></i>Chatbot</button>
     <button class="sb" id="sn-sr" onclick="goSeg('sr')"><i class="ti ti-search" aria-hidden="true"></i>Search</button>
   </div>
@@ -1768,13 +1768,13 @@ function goBack() {
   if(html) {
     rp(id, html, 'left');
   } else {
-    const fns = {home:hHome,wt:hWT,cl:hCL,fl:hFuel,wld:hWelding,gas:hGases,nv:hNV,nbi:hNBI,kl:hKluber,rp:hRopes,ref:hRefrig,ai:hAI,sr:hSrch};
+    const fns = {home:hHome,wt:hWT,cl:hCL,fl:hFuel,wld:hWelding,gas:hGases,nv:hNV,nbi:hNBI,kl:hKluber,rp:hRopes,ref:hRefrig,wsr:hWSR,ai:hAI,sr:hSrch};
     rp(id, (fns[id]||hHome)(), 'left');
   }
 }
-function sseg(id) { ['home','wt','cl','fl','wld','gas','ref','kl','rp','nv','nbi','ai','sr'].forEach(s=>document.getElementById('sn-'+s).classList.toggle('on',s===id)); }
+function sseg(id) { ['home','wt','cl','fl','wld','gas','ref','kl','rp','nv','nbi','wsr','ai','sr'].forEach(s=>document.getElementById('sn-'+s).classList.toggle('on',s===id)); }
 function goHome() { sseg('home'); stk=[{id:'home',html:null}]; rp('home', hHome(), 'left'); }
-function goSeg(s) { sseg(s); const fn={wt:hWT,cl:hCL,fl:hFuel,wld:hWelding,gas:hGases,nv:hNV,nbi:hNBI,kl:hKluber,rp:hRopes,ref:hRefrig,ai:hAI,sr:hSrch}[s]; const html=fn?fn():null; stk=[{id:s,html}]; if(html)rp(s,html); }
+function goSeg(s) { sseg(s); const fn={wt:hWT,cl:hCL,fl:hFuel,wld:hWelding,gas:hGases,nv:hNV,nbi:hNBI,kl:hKluber,rp:hRopes,ref:hRefrig,wsr:hWSR,ai:hAI,sr:hSrch}[s]; const html=fn?fn():null; stk=[{id:s,html}]; if(html)rp(s,html); }
 function prB(pr) { const l=pr.toLowerCase(); return `<span class="bdg ${l.includes('must')?'b-must':l.includes('good')?'b-gth':'b-opt'}">${pr}</span>`; }
 function bb(b) { return b==='UNITOR'?'b-u':b==='NALFLEET'?'b-n':'b-nd'; }
 
@@ -1880,7 +1880,6 @@ function pRow(it){
 // ── HOME ──────────────────────────────────────────────────────────────────────
 function hHome(){
   const divs=[
-    {seg:'nbi',icon:'ti-ship',color:'#003057',bg:'#E8EEF8',title:'New Building (NBI)',sub:'Vessel configurator  |  full product package  |  PDF export'},
     {seg:'wt',icon:'ti-droplet',color:'var(--accent)',bg:'var(--accent-bg)',title:'Water Treatment',sub:'Boiler  |  Cooling  |  Evaporator  |  Ballast  |  Potable  |  Pool'},
     {seg:'cl',icon:'ti-spray',color:'var(--accent)',bg:'var(--accent-bg)',title:'Cleaning',sub:'Engine room & deck'},
     {seg:'fl',icon:'ti-droplet-filled',color:'#B45000',bg:'#FBE8D5',title:'Fuel Treatment',sub:'Heavy fuel  |  Distillate  |  Test kits'},
@@ -1888,6 +1887,7 @@ function hHome(){
     {seg:'gas',icon:'ti-cylinder',color:'#0077A8',bg:'#E0F4FC',title:'Gases',sub:'Oxygen, acetylene, argon'},
     {seg:'nv',icon:'ti-building-warehouse',color:'#2D4A8A',bg:'#E8EEF8',title:'Cargo Hold Cleaning',sub:'Navadan  |  product selector  |  procedures'},
     {seg:'nbi',icon:'ti-ship',color:'#003057',bg:'#E8EEF8',title:'New Building (NBI)',sub:'Vessel configurator  |  full product package'},
+    {seg:'wsr',icon:'ti-clipboard-text',color:'#0B6E4F',bg:'#E8F5F0',title:'PSE Service Report',sub:'Water treatment  |  on-board inspection  |  PDF'},
     {seg:'kl',icon:'ti-droplet-filled',color:'var(--amber)',bg:'var(--amber-bg)',title:'Kluber',sub:'Specialty lubricants'},
     {seg:'ref',icon:'ti-temperature',color:'#C8102E',bg:'#FDEAED',title:'Refrigerants',sub:'Unicool  -  low GWP'},
     {seg:'rp',icon:'ti-git-branch',color:'var(--green)',bg:'var(--green-bg)',title:'Timm Ropes',sub:'Mooring ropes MEG4'}];
@@ -4758,7 +4758,10 @@ ${sections.map(sec=>{
 }
 
 function nbiSendEmail() {
-  // Build product list text
+  // Step 1 — generate & download the PDF so the user can attach it
+  nbiExportPDF();
+
+  // Step 2 — build a full product list for the email body
   const sections = [
     {id:'water',label:'Water Treatment'},{id:'cleaning',label:'Cleaning'},
     {id:'fuel',label:'Fuel Treatment'},{id:'cargo',label:'Cargo Hold'},
@@ -4766,193 +4769,1101 @@ function nbiSendEmail() {
     {id:'lubricants',label:'Lubricants'},{id:'refrigerants',label:'Refrigerants'},
   ];
   let productLines = '';
-  let totalProds = 0;
   sections.forEach(sec => {
     const s = NBI.selections[sec.id];
     if(!s || s.skip || !s.products.length) return;
-    productLines += `<h3 style="color:#003057;margin:16px 0 6px;font-size:13px;border-bottom:1px solid #E8EEF8;padding-bottom:4px">${sec.label}</h3><table style="width:100%;border-collapse:collapse;font-size:11px">`;
-    productLines += `<tr style="background:#003057;color:#fff"><th style="padding:5px 8px;text-align:left">Product</th><th style="padding:5px 8px;text-align:left">Part No.</th><th style="padding:5px 8px;text-align:left">Brand</th><th style="padding:5px 8px;text-align:left">Notes</th></tr>`;
-    s.products.forEach((p,i) => {
-      totalProds++;
-      productLines += `<tr style="background:${i%2===0?'#F8FAFF':'#fff'}"><td style="padding:5px 8px;font-weight:600">${p.name}</td><td style="padding:5px 8px;color:#666;font-family:monospace">${p.p||'—'}</td><td style="padding:5px 8px">${p.brand}</td><td style="padding:5px 8px;color:#555">${p.note||''}</td></tr>`;
+    productLines += `\n${sec.label.toUpperCase()}\n`;
+    s.products.forEach(p => {
+      productLines += `  - ${p.name}${p.p?' (#'+p.p+')':''}${p.brand?' ['+p.brand+']':''} ${p.note?'| '+p.note:''}\n`;
     });
-    productLines += `</table>`;
   });
 
-  // Build full HTML email body
-  const emailHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:Arial,sans-serif;color:#1A1A2E;max-width:700px;margin:0 auto">
-    <div style="background:#003057;padding:20px 24px;border-radius:8px 8px 0 0">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px">Wilhelmsen Ships Service</div>
-      <div style="font-size:22px;font-weight:800;color:#fff">New Building Product Package</div>
-      <div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:4px">Tailored selection for ${NBI.name}</div>
-    </div>
-    <div style="background:#F0F4FA;padding:14px 24px;border:1px solid #E0E8F0;display:flex;gap:32px;flex-wrap:wrap">
-      <div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#888">Vessel</div><div style="font-size:13px;font-weight:700;color:#003057">${NBI.name}</div></div>
-      <div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#888">IMO</div><div style="font-size:13px;font-weight:700;color:#003057">${NBI.imo}</div></div>
-      <div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#888">Type</div><div style="font-size:13px;font-weight:700;color:#003057;text-transform:capitalize">${NBI.type}</div></div>
-      <div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#888">DWT</div><div style="font-size:13px;font-weight:700;color:#003057">${NBI.dwt}</div></div>
-      ${NBI.flag?`<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#888">Flag</div><div style="font-size:13px;font-weight:700;color:#003057">${NBI.flag}</div></div>`:''}
-      <div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#888">Products</div><div style="font-size:13px;font-weight:700;color:#003057">${totalProds} selected</div></div>
-    </div>
-    <div style="padding:0 24px 24px;border:1px solid #E0E8F0;border-top:none">${productLines}</div>
-    <div style="padding:14px 24px;background:#F0F4FA;border:1px solid #E0E8F0;border-top:none;border-radius:0 0 8px 8px;font-size:10px;color:#888">
-      Generated by WSS Product Catalogue · ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})} · wilhelmsen.com
-    </div>
-  </body></html>`;
+  const subject = encodeURIComponent(`NBI Product Package — ${NBI.name} (IMO ${NBI.imo})`);
+  const body = encodeURIComponent(
+`Dear Omar,
 
-  // Build the PDF HTML as a base64 attachment (reuse nbiExportPDF logic)
-  const pdfHtml = nbiGetPDFContent();
-  const pdfBase64 = btoa(unescape(encodeURIComponent(pdfHtml)));
-  const fileName = `NBI_${NBI.name.replace(/\s+/g,'_')}_IMO${NBI.imo}.html`;
+Please find below the New Building product configuration for the following vessel.
+The full PDF report has been downloaded — please find it attached.
 
-  // Send via Microsoft Graph API through MCP
-  nbiSendViaGraph(emailHtml, pdfBase64, fileName);
+VESSEL DETAILS
+--------------
+Vessel Name : ${NBI.name}
+IMO Number  : ${NBI.imo}
+Vessel Type : ${NBI.type}
+Size (DWT)  : ${NBI.dwt}
+Flag State  : ${NBI.flag||'—'}
+
+PRODUCT SELECTION
+-----------------${productLines}
+Please review the attached PDF for the complete package and contact me to confirm quantities and pricing.
+
+Kind regards`
+  );
+
+  // Small delay so PDF download starts before mailto opens
+  setTimeout(() => {
+    window.location.href = `mailto:omar.labib@wilhelmsen.com?subject=${subject}&body=${body}`;
+  }, 800);
 }
 
-async function nbiSendViaGraph(emailHtml, attachmentBase64, fileName) {
-  // Show sending state
-  const btn = document.querySelector('[onclick="nbiSendEmail()"]');
-  if(btn) { btn.disabled=true; btn.innerHTML='<i class="ti ti-loader" style="font-size:15px;animation:spin 1s linear infinite"></i> Sending...'; }
 
-  const emailPayload = {
-    message: {
-      subject: `NBI Product Package — ${NBI.name} (IMO ${NBI.imo})`,
-      body: { contentType: 'HTML', content: emailHtml },
-      toRecipients: [{ emailAddress: { address: 'omar.labib@wilhelmsen.com', name: 'Omar Labib' } }],
-      attachments: [{
-        '@odata.type': '#microsoft.graph.fileAttachment',
-        name: fileName,
-        contentType: 'text/html',
-        contentBytes: attachmentBase64
-      }]
-    },
-    saveToSentItems: true
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PSE WATER SERVICE REPORT (WSR) — v3
+// ══════════════════════════════════════════════════════════════════════════════
+let WSR = {};
+const WSR_ACC = '#1D6FA4';
+const WSR_STEPS = [
+  {id:'vessel',    label:'Vessel Info',       icon:'ti-ship'},
+  {id:'boiler',    label:'Boiler Water',       icon:'ti-flame'},
+  {id:'cooling',   label:'Cooling Water',      icon:'ti-droplet'},
+  {id:'waterprod', label:'Water Production',   icon:'ti-steam'},
+  {id:'potable',   label:'Potable Water',      icon:'ti-droplet-check'},
+  {id:'seawater',  label:'Seawater System',    icon:'ti-waves'},
+  {id:'waterproof',label:'Waterproof',         icon:'ti-device-laptop'},
+  {id:'ballast',   label:'Ballast Water',      icon:'ti-anchor'},
+  {id:'photos',    label:'Equipment Photos',   icon:'ti-camera'},
+  {id:'rob',       label:'ROB',                icon:'ti-package'},
+  {id:'comments',  label:'Comments',           icon:'ti-message'},
+  {id:'preview',   label:'Preview & Export',   icon:'ti-file-text'},
+];
+
+function hWSR() {
+  WSR = {
+    step:0, vessel:'', imo:'', type:'', customer:'', port:'',
+    date: new Date().toISOString().split('T')[0],
+    chiefEngineer:'', pse:'',
+    boiler:[], boilerProds:[], boilerTestKit:'', boilerReagent:'',
+    boilerLimits:{ph:{lo:9.5,hi:11}, pAlk:{lo:150,hi:300}, chloride:{lo:0,hi:200}, deha:{lo:0.1,hi:0.5}, conductivity:{lo:0,hi:2500}},
+    cooling:[], coolProds:[],
+    coolingLimits:{nitrite:{lo:1000,hi:3000}, ph:{lo:8,hi:11}, chloride:{lo:0,hi:50}, conductivity:{lo:3000,hi:5000}},
+    waterprod:{sysType:'', roMaker:'', roMakerOther:'', capacity:'', method:'', consumption:'', comments:'', prods:[]},
+    potable:{prods:[], freeText:'', dosingMethod:'', corrosionShield:false, lastCartridge:'', discoloration:false, discolorPhoto:null, comments:''},
+    seawater:{prods:[], swOther:'', dosingMethod:'', comments:''},
+    waterproof:{inUse:'', version:'', comments:''},
+    ballast:{maker:'', sysType:'', chemicals:[], ballastOther:'', chemType:'', dosingUnit:false, dosingUnitNotes:'', comments:''},
+    photos:[],
+    rob:{items:[], extraItems:[]},
+    comments:{general:''},
   };
+  return wsrPage();
+}
 
-  try {
-    const resp = await fetch('https://microsoft365.mcp.claude.com/mcp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tool: 'send_mail',
-        parameters: emailPayload
-      })
+function wsrPage() {
+  const s = WSR_STEPS[WSR.step];
+  const pct = Math.round(WSR.step/(WSR_STEPS.length-1)*100);
+  const hdr = `<div style="background:${WSR_ACC};padding:13px 14px 0;position:sticky;top:0;z-index:10">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+      <button onclick="wsrBack()" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;width:30px;height:30px;display:grid;place-items:center;cursor:pointer;flex-shrink:0">
+        <i class="ti ti-arrow-left" style="font-size:13px;color:#fff"></i>
+      </button>
+      <div style="flex:1">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5)">PSE SERVICE REPORT — STEP ${WSR.step+1}/${WSR_STEPS.length}</div>
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-top:1px">${s.label}</div>
+      </div>
+      ${WSR.vessel?`<div style="text-align:right"><div style="font-size:9px;color:rgba(255,255,255,.5)">VESSEL</div><div style="font-size:11px;font-weight:700;color:#fff">${WSR.vessel}</div></div>`:''}
+    </div>
+    <div style="height:3px;background:rgba(255,255,255,.15);border-radius:2px">
+      <div style="height:100%;width:${pct}%;background:#4FC3F7;border-radius:2px;transition:width .3s"></div>
+    </div>
+    <div style="display:flex;overflow-x:auto;padding:7px 0 9px;gap:3px;-webkit-overflow-scrolling:touch">
+      ${WSR_STEPS.map((st,i)=>`<div style="display:flex;align-items:center;gap:3px;flex-shrink:0;opacity:${i===WSR.step?'1':i<WSR.step?'0.7':'0.35'}">
+        <div style="width:17px;height:17px;border-radius:50%;background:${i<WSR.step?'#4FC3F7':i===WSR.step?'#fff':'rgba(255,255,255,.2)'};display:grid;place-items:center;flex-shrink:0">
+          ${i<WSR.step?'<i class="ti ti-check" style="font-size:9px;color:#003057"></i>':`<span style="font-size:8px;font-weight:800;color:${i===WSR.step?'#003057':'rgba(255,255,255,.4)'}">${i+1}</span>`}
+        </div>
+        ${i===WSR.step?`<span style="font-size:9px;font-weight:700;color:#fff;white-space:nowrap">${st.label}</span>`:''}
+        ${i<WSR_STEPS.length-1?'<div style="width:6px;height:1px;background:rgba(255,255,255,.2);flex-shrink:0"></div>':''}
+      </div>`).join('')}
+    </div>
+  </div>`;
+  return `<div style="background:var(--bg)">${hdr}<div style="padding:14px 14px 30px">${wsrBody(WSR.step)}</div></div>`;
+}
+
+function wsrBody(step) {
+  const id = WSR_STEPS[step].id;
+  if(id==='vessel')    return wsrStepVessel();
+  if(id==='boiler')    return wsrStepBoiler();
+  if(id==='cooling')   return wsrStepCooling();
+  if(id==='waterprod') return wsrStepWaterProd();
+  if(id==='potable')   return wsrStepPotable();
+  if(id==='seawater')  return wsrStepSeawater();
+  if(id==='waterproof')return wsrStepWaterproof();
+  if(id==='ballast')   return wsrStepBallast();
+  if(id==='photos')    return wsrStepPhotos();
+  if(id==='rob')       return wsrStepROB();
+  if(id==='comments')  return wsrStepComments();
+  if(id==='preview')   return wsrStepPreview();
+  return '';
+}
+
+function wsrRefresh() {
+  const html = wsrPage();
+  const entry = stk[stk.length-1];
+  if(entry && typeof entry==='object') entry.html = html;
+  const cur = pw.querySelector('.pg.active');
+  if(cur){const sy=cur.scrollTop;cur.innerHTML=html;cur.scrollTop=sy;}
+  else rp('wsr',html);
+}
+function wsrBack(){if(WSR.step>0){WSR.step--;wsrRefresh();}else goBack();}
+function wsrNext(){if(WSR.step<WSR_STEPS.length-1){WSR.step++;wsrRefresh();}}
+
+// ── SHARED UI ─────────────────────────────────────────────────────────────────
+function wsrCard(inner,mb=10){return `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:${mb}px">${inner}</div>`;}
+function wsrLbl(t,mt=12){return `<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin:${mt}px 0 6px">${t}</div>`;}
+function wsrChips(opts,sel,fn){return `<div style="display:flex;flex-wrap:wrap;gap:6px">${opts.map(o=>`<button onclick="${fn}('${o}')" style="padding:6px 12px;border-radius:20px;border:1.5px solid ${sel===o?WSR_ACC:'var(--border2)'};background:${sel===o?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:600;color:${sel===o?WSR_ACC:'var(--text2)'};cursor:pointer">${o}</button>`).join('')}</div>`;}
+function wsrMultiChips(opts,arr,fn){return `<div style="display:flex;flex-wrap:wrap;gap:6px">${opts.map(o=>`<button onclick="${fn}('${o}')" style="padding:6px 12px;border-radius:20px;border:1.5px solid ${arr.includes(o)?WSR_ACC:'var(--border2)'};background:${arr.includes(o)?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:600;color:${arr.includes(o)?WSR_ACC:'var(--text2)'};cursor:pointer">${o}</button>`).join('')}</div>`;}
+function wsrToggleArr(arr,v){const i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else arr.push(v);}
+function wsrYN(val,fn){return `<div style="display:flex;gap:6px">${['Yes','No'].map(v=>`<button onclick="${fn}('${v}')" style="flex:1;padding:9px;border-radius:9px;border:1.5px solid ${val===v?WSR_ACC:'var(--border2)'};background:${val===v?'#EFF6FF':'var(--card)'};font-size:12px;font-weight:700;color:${val===v?WSR_ACC:'var(--text3)'};cursor:pointer">${v}</button>`).join('')}</div>`;}
+// Named cooling yn handlers (generated per row)
+function wsrCoolOil_0(v){if(WSR.cooling[0])WSR.cooling[0].oilContam=v;wsrRefresh();}
+function wsrCoolOil_1(v){if(WSR.cooling[1])WSR.cooling[1].oilContam=v;wsrRefresh();}
+function wsrCoolOil_2(v){if(WSR.cooling[2])WSR.cooling[2].oilContam=v;wsrRefresh();}
+function wsrCoolOil_3(v){if(WSR.cooling[3])WSR.cooling[3].oilContam=v;wsrRefresh();}
+function wsrCoolOil_4(v){if(WSR.cooling[4])WSR.cooling[4].oilContam=v;wsrRefresh();}
+function wsrCoolTK_0(v){if(WSR.cooling[0])WSR.cooling[0].testKit=v;wsrRefresh();}
+function wsrCoolTK_1(v){if(WSR.cooling[1])WSR.cooling[1].testKit=v;wsrRefresh();}
+function wsrCoolTK_2(v){if(WSR.cooling[2])WSR.cooling[2].testKit=v;wsrRefresh();}
+function wsrCoolTK_3(v){if(WSR.cooling[3])WSR.cooling[3].testKit=v;wsrRefresh();}
+function wsrCoolTK_4(v){if(WSR.cooling[4])WSR.cooling[4].testKit=v;wsrRefresh();}
+function wsrCoolRE_0(v){if(WSR.cooling[0])WSR.cooling[0].reagent=v;wsrRefresh();}
+function wsrCoolRE_1(v){if(WSR.cooling[1])WSR.cooling[1].reagent=v;wsrRefresh();}
+function wsrCoolRE_2(v){if(WSR.cooling[2])WSR.cooling[2].reagent=v;wsrRefresh();}
+function wsrCoolRE_3(v){if(WSR.cooling[3])WSR.cooling[3].reagent=v;wsrRefresh();}
+function wsrCoolRE_4(v){if(WSR.cooling[4])WSR.cooling[4].reagent=v;wsrRefresh();}
+function wsrNxtBtn(lbl,fn,dis=false){return `<button onclick="${fn}" ${dis?'disabled':''} style="width:100%;padding:13px;background:${dis?'var(--bg3)':WSR_ACC};border:none;border-radius:12px;color:${dis?'var(--text3)':'#fff'};font-size:13px;font-weight:700;cursor:${dis?'not-allowed':'pointer'};margin-top:14px;display:flex;align-items:center;justify-content:center;gap:6px">${lbl} <i class="ti ti-arrow-right" style="font-size:12px"></i></button>`;}
+function wsrSkipBtn(){return `<button onclick="wsrNext()" style="width:100%;padding:10px;background:transparent;border:1px solid var(--border2);border-radius:10px;color:var(--text3);font-size:12px;cursor:pointer;margin-top:6px">Skip this section</button>`;}
+
+// Status helpers
+function wsrSt(val,lo,hi){if(val===''||val===null||val===undefined||isNaN(parseFloat(val)))return'na';const v=parseFloat(val);if(v<lo)return'low';if(v>hi)return'high';return'ok';}
+function wsrStC(st){if(st==='ok')return{bg:'#E8F5E9',tc:'#155D32',lbl:'OK'};if(st==='low')return{bg:'#FDEAED',tc:'#C0392B',lbl:'LOW'};if(st==='high')return{bg:'#FFF3E0',tc:'#B45000',lbl:'HIGH'};return{bg:'#F0F5FA',tc:'#7A95B0',lbl:'—'};}
+function wsrBadge(val,lo,hi){const c=wsrStC(wsrSt(val,lo,hi));return `<span style="font-size:8px;font-weight:700;padding:1px 6px;border-radius:5px;background:${c.bg};color:${c.tc}">${c.lbl}</span>`;}
+
+// ── STEP 1: VESSEL ────────────────────────────────────────────────────────────
+function wsrStepVessel(){return `
+  <div style="background:linear-gradient(135deg,${WSR_ACC},#1A4A7A);border-radius:14px;padding:14px;margin-bottom:14px">
+    <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px">WILHELMSEN SHIPS SERVICE</div>
+    <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px">PSE Water Service Report</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.6">Complete all sections to generate a professional PDF report.</div>
+  </div>
+  ${wsrCard(`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="grid-column:span 2"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Vessel Name</div><input id="wsr-vessel" value="${WSR.vessel||''}" placeholder="e.g. WIND PACE" onblur="WSR.vessel=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">IMO Number</div><input id="wsr-imo" value="${WSR.imo||''}" placeholder="9957830" onblur="WSR.imo=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Date</div><input id="wsr-date" type="date" value="${WSR.date||''}" onblur="WSR.date=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
+      <div style="grid-column:span 2"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Customer / Owner</div><input id="wsr-customer" value="${WSR.customer||''}" placeholder="e.g. CADELER A/S" onblur="WSR.customer=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
+      <div style="grid-column:span 2"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Port / Place of Service</div><input id="wsr-port" value="${WSR.port||''}" placeholder="e.g. Esbjerg" onblur="WSR.port=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
+    </div>`)}
+  ${wsrCard(`
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Chief Engineer</div><input id="wsr-chiefEngineer" value="${WSR.chiefEngineer||''}" placeholder="Full name" onblur="WSR.chiefEngineer=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">WSS Service Engineer (PSE)</div><input id="wsr-pse" value="${WSR.pse||''}" placeholder="Full name" onblur="WSR.pse=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box">`)}
+  ${wsrLbl('Vessel Type')}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+    ${['Offshore Support','Bulk Carrier','Tanker','Container','General Cargo','Passenger Vessel','Other'].map(t=>`<button onclick="WSR.type='${t}';wsrRefresh()" style="padding:9px;border-radius:9px;border:1.5px solid ${WSR.type===t?WSR_ACC:'var(--border2)'};background:${WSR.type===t?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:600;color:${WSR.type===t?WSR_ACC:'var(--text2)'};cursor:pointer">${t}</button>`).join('')}
+  </div>
+  ${wsrNxtBtn('Continue to Boiler Water','wsrVesselNext()',!WSR.vessel||!WSR.imo)}`;}
+
+function wsrVesselNext(){
+  ['vessel','imo','customer','port','date','chiefEngineer','pse'].forEach(k=>{const el=document.getElementById('wsr-'+k);if(el)WSR[k]=el.value;});
+  if(!WSR.vessel||!WSR.imo)return;
+  wsrNext();
+}
+
+// ── STEP 2: BOILER WATER ──────────────────────────────────────────────────────
+function wsrStepBoiler(){
+  if(!WSR.boiler.length) WSR.boiler=[wsrNewBoilerRow()];
+  const L=WSR.boilerLimits;
+  const alerts=wsrBoilerAlerts();
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Boiler Water Systems</div>
+  ${wsrCard(`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px">Adjust Control Limits <span style="font-size:9px;color:var(--text3);font-weight:400;text-transform:none">(vessel-specific overrides)</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${[['pH','ph','9.5 – 11'],['P.Alkalinity (ppm CaCO₃)','pAlk','150 – 300'],['Chloride (ppm Cl)','chloride','0 – 200'],['DEHA (ppm DEHA)','deha','0.1 – 0.5'],['Conductivity (µS/cm)/TDS','conductivity','0 – 2500']].map(([lbl,k,def])=>`<div>
+        <div style="font-size:10px;color:var(--text3);margin-bottom:3px">${lbl} <span style="font-size:9px;color:var(--accent)">${def}</span></div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <input type="number" step="any" value="${L[k].lo}" onblur="WSR.boilerLimits['${k}'].lo=parseFloat(this.value)||${L[k].lo};wsrRefresh()" style="width:50%;padding:6px 7px;border:1.5px solid var(--border2);border-radius:7px;font-size:11px;background:var(--card);color:var(--text)">
+          <span style="font-size:10px;color:var(--text3)">–</span>
+          <input type="number" step="any" value="${L[k].hi}" onblur="WSR.boilerLimits['${k}'].hi=parseFloat(this.value)||${L[k].hi};wsrRefresh()" style="width:50%;padding:6px 7px;border:1.5px solid var(--border2);border-radius:7px;font-size:11px;background:var(--card);color:var(--text)">
+        </div>
+      </div>`).join('')}
+    </div>`)}
+  ${WSR.boiler.map((r,i)=>wsrBoilerRow(r,i,L)).join('')}
+  <button onclick="WSR.boiler.push(wsrNewBoilerRow());wsrRefresh()" style="width:100%;padding:9px;border:1.5px dashed var(--border2);border-radius:10px;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;margin-bottom:10px"><i class="ti ti-plus" style="font-size:11px;vertical-align:-1px"></i> Add boiler system</button>
+  ${wsrLbl('Products in use')}
+  ${wsrMultiChips(['Autotreat','Combitreat','Oxygen Scavenger Plus','Boiler Coagulant','Condensate Control','Alkalinity Control','BWT Liquid Plus','Liquidtreat','Maxitreat'],(WSR.boilerProds||[]),'wsrToggleBP')}
+  ${wsrLbl('Test Kit & Reagent Check',10)}
+  ${wsrCard(`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-weight:600">Right test kit in use?</div>${wsrYN(WSR.boilerTestKit,'wsrBoilerTK')}</div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-weight:600">Reagent within expiry date?</div>${wsrYN(WSR.boilerReagent,'wsrBoilerRE')}</div>
+    </div>`)}
+  ${alerts?`<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 12px;margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:#991B1B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">⚠ System Alerts</div>${alerts}</div>`:''}
+  ${wsrNxtBtn('Continue to Cooling Water','wsrNext()')}${wsrSkipBtn()}`;}
+
+function wsrNewBoilerRow(){return{name:'',capacity:'',pAlk:'',ph:'',chloride:'',deha:'',conductivity:'',makeup:'',dosing:'Manual',blowdown:'',appearance:''};}
+function wsrToggleBP(p){wsrToggleArr(WSR.boilerProds,p);wsrRefresh();}
+function wsrBoilerTK(v){WSR.boilerTestKit=v;wsrRefresh();}
+function wsrBoilerRE(v){WSR.boilerReagent=v;wsrRefresh();}
+
+function wsrBoilerRow(r,i,L){
+  const fields=[
+    ['ph','pH',L.ph],
+    ['pAlk','P.Alkalinity (ppm CaCO₃)',L.pAlk],
+    ['chloride','Chloride (ppm Cl)',L.chloride],
+    ['deha','DEHA (ppm DEHA)',L.deha],
+    ['conductivity','Conductivity (µS/cm)/TDS',L.conductivity],
+  ];
+  return `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;margin-bottom:8px">
+    <div style="display:flex;gap:7px;margin-bottom:8px;align-items:center">
+      <input value="${r.name||''}" placeholder="System name e.g. DG1 HT" onblur="WSR.boiler[${i}].name=this.value"
+        style="flex:1;padding:7px 9px;border:1.5px solid ${WSR_ACC}40;border-radius:8px;font-size:12px;font-weight:600;background:var(--bg3);color:var(--text)">
+      <button onclick="WSR.boiler.splice(${i},1);wsrRefresh()" style="background:var(--red-bg);border:none;border-radius:6px;width:26px;height:26px;display:grid;place-items:center;cursor:pointer">
+        <i class="ti ti-x" style="font-size:11px;color:var(--red)"></i>
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      ${fields.map(([fld,lbl,cl])=>{const st=wsrSt(r[fld],cl.lo,cl.hi);const c=wsrStC(st);return`<div>
+        <div style="font-size:10px;color:var(--text3);margin-bottom:2px;display:flex;justify-content:space-between;align-items:center"><span>${lbl}</span>${r[fld]!==''&&r[fld]!==undefined?wsrBadge(r[fld],cl.lo,cl.hi):''}</div>
+        <input type="number" step="any" value="${r[fld]||''}" placeholder="—"
+          onblur="WSR.boiler[${i}]['${fld}']=this.value;wsrRefresh()"
+          style="width:100%;padding:7px 8px;border:1.5px solid ${st!=='na'?c.tc+'50':'var(--border2)'};border-radius:7px;font-size:13px;font-weight:600;background:${st!=='na'?c.bg:'var(--card)'};color:var(--text)">
+      </div>`;}).join('')}
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Capacity (m³)</div>
+        <input type="number" value="${r.capacity||''}" placeholder="—" onblur="WSR.boiler[${i}].capacity=this.value"
+          style="width:100%;padding:7px 8px;border:1.5px solid var(--border2);border-radius:7px;font-size:13px;background:var(--card);color:var(--text)">
+      </div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Make-up (L/day)</div>
+        <input type="number" value="${r.makeup||''}" placeholder="—" onblur="WSR.boiler[${i}].makeup=this.value"
+          style="width:100%;padding:7px 8px;border:1.5px solid var(--border2);border-radius:7px;font-size:13px;background:var(--card);color:var(--text)">
+      </div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Dosing Method</div>
+        <div style="display:flex;gap:5px">${['Manual','Dosing System'].map(m=>`<button onclick="WSR.boiler[${i}].dosing='${m}';wsrRefresh()" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid ${r.dosing===m?WSR_ACC:'var(--border2)'};background:${r.dosing===m?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:700;color:${r.dosing===m?WSR_ACC:'var(--text3)'};cursor:pointer">${m}</button>`).join('')}</div>
+      </div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Blowdown</div>
+        <div style="display:flex;gap:5px">${['Daily','Weekly','None'].map(b=>`<button onclick="WSR.boiler[${i}].blowdown='${b}';wsrRefresh()" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid ${r.blowdown===b?WSR_ACC:'var(--border2)'};background:${r.blowdown===b?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:700;color:${r.blowdown===b?WSR_ACC:'var(--text3)'};cursor:pointer">${b}</button>`).join('')}</div>
+      </div>
+      <div style="grid-column:span 2"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Sample Appearance</div>
+        <div style="display:flex;gap:5px">${['Clear','Cloudy','Coloured'].map(a=>`<button onclick="WSR.boiler[${i}].appearance='${a}';wsrRefresh()" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid ${r.appearance===a?WSR_ACC:'var(--border2)'};background:${r.appearance===a?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:600;color:${r.appearance===a?WSR_ACC:'var(--text3)'};cursor:pointer">${a}</button>`).join('')}</div>
+      </div>
+    </div>
+  </div>`;}
+
+function wsrBoilerAlerts(){
+  const L=WSR.boilerLimits; const out=[];
+  WSR.boiler.forEach(r=>{
+    const nm=r.name||'Unnamed';
+    [['ph','pH',L.ph],['pAlk','P.Alkalinity',L.pAlk],['chloride','Chloride',L.chloride],['deha','DEHA',L.deha],['conductivity','Conductivity',L.conductivity]].forEach(([fld,lbl,cl])=>{
+      if(!r[fld])return;const st=wsrSt(r[fld],cl.lo,cl.hi);
+      if(st==='low')out.push(`<div style="font-size:11px;color:#991B1B;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FEF2F2;border-radius:6px"><b>${nm} — ${lbl} LOW (${r[fld]}):</b> ${wsrBoilerMsg(fld,'low')}</div>`);
+      if(st==='high')out.push(`<div style="font-size:11px;color:#92400E;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FFFBEB;border-radius:6px"><b>${nm} — ${lbl} HIGH (${r[fld]}):</b> ${wsrBoilerMsg(fld,'high')}</div>`);
     });
-
-    if(resp.ok) {
-      nbiShowToast('✓ Email sent to omar.labib@wilhelmsen.com with PDF attached', '#155D32');
-    } else {
-      // Fallback: open mailto + download PDF
-      nbiMailtoFallback();
-    }
-  } catch(e) {
-    // Fallback: open mailto + download PDF
-    nbiMailtoFallback();
-  } finally {
-    if(btn) { btn.disabled=false; btn.innerHTML='<i class="ti ti-mail" style="font-size:15px"></i> Email to omar.labib@wilhelmsen.com'; }
-  }
-}
-
-function nbiMailtoFallback() {
-  // Download PDF then open prefilled mailto
-  const link = document.createElement('a');
-  const pdfHtml = nbiGetPDFContent();
-  const blob = new Blob([pdfHtml], {type:'text/html'});
-  link.href = URL.createObjectURL(blob);
-  link.download = `NBI_${NBI.name.replace(/\s+/g,'_')}_IMO${NBI.imo}.html`;
-  link.click();
-
-  const sections = [{id:'water',label:'Water Treatment'},{id:'cleaning',label:'Cleaning'},{id:'fuel',label:'Fuel Treatment'},{id:'cargo',label:'Cargo Hold'},{id:'ropes',label:'Mooring Ropes'},{id:'welding',label:'Welding & Gases'},{id:'lubricants',label:'Lubricants'},{id:'refrigerants',label:'Refrigerants'}];
-  let txt = '';
-  sections.forEach(sec => {
-    const s = NBI.selections[sec.id];
-    if(!s||s.skip||!s.products.length) return;
-    txt += `\n${sec.label.toUpperCase()}\n`;
-    s.products.forEach(p => { txt += `  - ${p.name}${p.p?' (#'+p.p+')':''}${p.brand?' ['+p.brand+']':''}\n`; });
   });
-  const subj = encodeURIComponent(`NBI Product Package — ${NBI.name} (IMO ${NBI.imo})`);
-  const body = encodeURIComponent(`Dear Omar,\n\nPlease find the NBI package for ${NBI.name} (IMO ${NBI.imo}).\nThe PDF report has been downloaded — please attach it.\n\nVessel: ${NBI.name} | IMO: ${NBI.imo} | Type: ${NBI.type} | DWT: ${NBI.dwt}\n${txt}\nKind regards`);
-  setTimeout(()=>{ window.location.href = `mailto:omar.labib@wilhelmsen.com?subject=${subj}&body=${body}`; }, 600);
-  nbiShowToast('PDF downloaded — please attach it to the email', '#B45000');
+  return out.join('');
+}
+function wsrBoilerMsg(fld,dir){
+  const m={
+    ph:{low:'Low pH — insufficient scale control. Increase Autotreat dosage.',high:'High pH — risk of carryover and caustic attack. Reduce Autotreat dosage.'},
+    pAlk:{low:'Low P-Alkalinity — insufficient corrosion protection. Increase Autotreat dosage.',high:'High P-Alkalinity — foaming risk. Increase blowdown frequency to reduce concentration.'},
+    chloride:{low:'',high:'High Chloride — check for seawater/cooler leaks. Increase blowdown frequency.'},
+    deha:{low:'Low DEHA — dissolved oxygen risk, corrosion in condensate lines. Increase Oxygen Scavenger Plus dosage.',high:'DEHA excessive — reduce dosage.'},
+    conductivity:{low:'',high:'High Conductivity — high TDS, foaming and carryover risk. Increase blowdown. Consider Boiler Coagulant (20 ml/1,000 L) if water is discoloured.'}
+  };
+  return (m[fld]&&m[fld][dir])||'Check system and adjust dosage.';
 }
 
-function nbiShowToast(msg, col) {
-  const t = document.createElement('div');
-  t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${col};color:#fff;padding:11px 18px;border-radius:10px;font-size:12px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.25);white-space:nowrap;max-width:90vw;text-align:center`;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 4000);
+// ── STEP 3: COOLING WATER ─────────────────────────────────────────────────────
+function wsrStepCooling(){
+  if(!WSR.cooling.length) WSR.cooling=[wsrNewCoolRow()];
+  const L=WSR.coolingLimits;
+  const alerts=wsrCoolAlerts();
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Cooling Water Systems</div>
+  ${wsrCard(`<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px">Adjust Control Limits</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${[['Nitrite (ppm NO₂)','nitrite','1000 – 3000'],['pH','ph','8 – 11'],['Chloride (ppm Cl)','chloride','0 – 50'],['Conductivity (µS/cm)','conductivity','3000 – 5000']].map(([lbl,k,def])=>`<div>
+        <div style="font-size:10px;color:var(--text3);margin-bottom:3px">${lbl} <span style="font-size:9px;color:var(--accent)">${def}</span></div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <input type="number" step="any" value="${L[k].lo}" onblur="WSR.coolingLimits['${k}'].lo=parseFloat(this.value)||${L[k].lo};wsrRefresh()" style="width:50%;padding:6px 7px;border:1.5px solid var(--border2);border-radius:7px;font-size:11px;background:var(--card);color:var(--text)">
+          <span style="font-size:10px;color:var(--text3)">–</span>
+          <input type="number" step="any" value="${L[k].hi}" onblur="WSR.coolingLimits['${k}'].hi=parseFloat(this.value)||${L[k].hi};wsrRefresh()" style="width:50%;padding:6px 7px;border:1.5px solid var(--border2);border-radius:7px;font-size:11px;background:var(--card);color:var(--text)">
+        </div>
+      </div>`).join('')}
+    </div>`)}
+  ${WSR.cooling.map((r,i)=>wsrCoolRow(r,i,L)).join('')}
+  <button onclick="WSR.cooling.push(wsrNewCoolRow());wsrRefresh()" style="width:100%;padding:9px;border:1.5px dashed var(--border2);border-radius:10px;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;margin-bottom:10px"><i class="ti ti-plus"></i> Add cooling system</button>
+  ${wsrLbl('Products in use')}
+  ${wsrMultiChips(['Nalfleet 2000','Rocor NB Liquid','Engine Water Treatment','Cooltreat AL'],(WSR.coolProds||[]),'wsrToggleCP')}
+  ${alerts?`<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 12px;margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:#991B1B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">⚠ System Alerts</div>${alerts}</div>`:''}
+  ${wsrNxtBtn('Continue to Water Production','wsrNext()')}${wsrSkipBtn()}`;}
+
+function wsrNewCoolRow(){return{name:'',capacity:'',nitrite:'',ph:'',chloride:'',conductivity:'',pAlk:'',makeup:'',dosing:'Manual',appearance:'',oilContam:'',testKit:'',reagent:''};}
+function wsrToggleCP(p){wsrToggleArr(WSR.coolProds,p);wsrRefresh();}
+function wsrCoolSet(i,field,val){if(WSR.cooling[i])WSR.cooling[i][field]=val;wsrRefresh();}
+
+function wsrCoolRow(r,i,L){
+  const fields=[
+    ['nitrite','Nitrite (ppm NO₂)',L.nitrite],
+    ['ph','pH',L.ph],
+    ['chloride','Chloride (ppm Cl)',L.chloride],
+    ['conductivity','Conductivity (µS/cm)',L.conductivity],
+    ['pAlk','P.Alkalinity (ppm CaCO₃)',{lo:40,hi:300}],
+  ];
+  return `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:11px 12px;margin-bottom:8px">
+    <div style="display:flex;gap:7px;margin-bottom:8px;align-items:center">
+      <input value="${r.name||''}" placeholder="System name e.g. DG1 HT" onblur="WSR.cooling[${i}].name=this.value"
+        style="flex:1;padding:7px 9px;border:1.5px solid ${WSR_ACC}40;border-radius:8px;font-size:12px;font-weight:600;background:var(--bg3);color:var(--text)">
+      <button onclick="WSR.cooling.splice(${i},1);wsrRefresh()" style="background:var(--red-bg);border:none;border-radius:6px;width:26px;height:26px;display:grid;place-items:center;cursor:pointer">
+        <i class="ti ti-x" style="font-size:11px;color:var(--red)"></i>
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      ${fields.map(([fld,lbl,cl])=>{const st=wsrSt(r[fld],cl.lo,cl.hi);const c=wsrStC(st);return`<div>
+        <div style="font-size:10px;color:var(--text3);margin-bottom:2px;display:flex;justify-content:space-between;align-items:center"><span>${lbl}</span>${r[fld]!==''&&r[fld]!==undefined?wsrBadge(r[fld],cl.lo,cl.hi):''}</div>
+        <input type="number" step="any" value="${r[fld]||''}" placeholder="—"
+          onblur="WSR.cooling[${i}]['${fld}']=this.value;wsrRefresh()"
+          style="width:100%;padding:7px 8px;border:1.5px solid ${st!=='na'?c.tc+'50':'var(--border2)'};border-radius:7px;font-size:13px;font-weight:600;background:${st!=='na'?c.bg:'var(--card)'};color:var(--text)">
+      </div>`;}).join('')}
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Capacity (m³)</div>
+        <input type="number" value="${r.capacity||''}" placeholder="—" onblur="WSR.cooling[${i}].capacity=this.value"
+          style="width:100%;padding:7px 8px;border:1.5px solid var(--border2);border-radius:7px;font-size:13px;background:var(--card);color:var(--text)">
+      </div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Make-up (L/day)</div>
+        <input type="number" value="${r.makeup||''}" placeholder="—" onblur="WSR.cooling[${i}].makeup=this.value"
+          style="width:100%;padding:7px 8px;border:1.5px solid var(--border2);border-radius:7px;font-size:13px;background:var(--card);color:var(--text)">
+      </div>
+      <div style="grid-column:span 2"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Dosing Method</div>
+        <div style="display:flex;gap:5px">${['Manual','Dosing System'].map(m=>`<button onclick="WSR.cooling[${i}].dosing='${m}';wsrRefresh()" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid ${r.dosing===m?WSR_ACC:'var(--border2)'};background:${r.dosing===m?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:700;color:${r.dosing===m?WSR_ACC:'var(--text3)'};cursor:pointer">${m}</button>`).join('')}</div>
+      </div>
+      <div style="grid-column:span 2"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Sample Appearance</div>
+        <div style="display:flex;gap:5px">${['Clear','Cloudy','Coloured'].map(a=>`<button onclick="WSR.cooling[${i}].appearance='${a}';wsrRefresh()" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid ${r.appearance===a?WSR_ACC:'var(--border2)'};background:${r.appearance===a?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:600;color:${r.appearance===a?WSR_ACC:'var(--text3)'};cursor:pointer">${a}</button>`).join('')}</div>
+      </div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Oil Contamination?</div>
+        <div style="display:flex;gap:5px">${['Yes','No'].map(v=>`<button onclick="wsrCoolSet(${i},'oilContam','${v}')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid ${r.oilContam===v?'#1D6FA4':'var(--border2)'};background:${r.oilContam===v?'#EFF6FF':'var(--card)'};font-size:12px;font-weight:700;color:${r.oilContam===v?'#1D6FA4':'var(--text3)'};cursor:pointer">${v}</button>`).join('')}</div>
+      </div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Right Test Kit?</div>
+        <div style="display:flex;gap:5px">${['Yes','No'].map(v=>`<button onclick="wsrCoolSet(${i},'testKit','${v}')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid ${r.testKit===v?'#1D6FA4':'var(--border2)'};background:${r.testKit===v?'#EFF6FF':'var(--card)'};font-size:12px;font-weight:700;color:${r.testKit===v?'#1D6FA4':'var(--text3)'};cursor:pointer">${v}</button>`).join('')}</div>
+      </div>
+      <div style="grid-column:span 2"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Reagent Within Expiry?</div>
+        <div style="display:flex;gap:5px">${['Yes','No'].map(v=>`<button onclick="wsrCoolSet(${i},'reagent','${v}')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid ${r.reagent===v?'#1D6FA4':'var(--border2)'};background:${r.reagent===v?'#EFF6FF':'var(--card)'};font-size:12px;font-weight:700;color:${r.reagent===v?'#1D6FA4':'var(--text3)'};cursor:pointer">${v}</button>`).join('')}</div>
+      </div>
+    </div>
+  </div>`;}
+
+function wsrCoolAlerts(){
+  const L=WSR.coolingLimits;const out=[];
+  WSR.cooling.forEach(r=>{
+    const nm=r.name||'Unnamed';
+    [['nitrite','Nitrite',L.nitrite],['ph','pH',L.ph],['chloride','Chloride',L.chloride],['conductivity','Conductivity',L.conductivity]].forEach(([fld,lbl,cl])=>{
+      if(!r[fld])return;const st=wsrSt(r[fld],cl.lo,cl.hi);
+      if(st==='low')out.push(`<div style="font-size:11px;color:#991B1B;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FEF2F2;border-radius:6px"><b>${nm} — ${lbl} LOW (${r[fld]}):</b> ${wsrCoolMsg(fld,'low')}</div>`);
+      if(st==='high')out.push(`<div style="font-size:11px;color:#92400E;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FFFBEB;border-radius:6px"><b>${nm} — ${lbl} HIGH (${r[fld]}):</b> ${wsrCoolMsg(fld,'high')}</div>`);
+    });
+    if(r.oilContam==='Yes') out.push(`<div style="font-size:11px;color:#991B1B;margin-bottom:5px;padding:5px 8px;background:#FEF2F2;border-radius:6px"><b>${nm} — Oil Contamination detected:</b> Investigate source of oil ingress. Drain and flush system if necessary.</div>`);
+  });
+  return out.join('');
+}
+function wsrCoolMsg(fld,dir){
+  const m={
+    nitrite:{low:'Low Nitrite — increased corrosion and pitting risk. Nitrite forms a passivation film on metal surfaces. Increase Rocor NB Liquid dosage immediately.',high:'High Nitrite — over-concentration. Stop chemical dosage and monitor until within target range.'},
+    ph:{low:'Low pH — corrosion risk. Increase Rocor NB Liquid dosage.',high:'High pH — scale and deposit risk. Reduce chemical dosage and increase blowdown.'},
+    chloride:{low:'',high:'High Chloride — seawater contamination suspected. Ensure make-up water contains <5 ppm Cl. Keep nitrite near upper limit until resolved.'},
+    conductivity:{low:'Low Conductivity — system may be diluted, risk of insufficient inhibitor concentration.',high:'High Conductivity — high TDS. Check for contamination and consider partial drain-down.'}
+  };
+  return (m[fld]&&m[fld][dir])||'Check system and adjust dosage.';
 }
 
-function nbiGetPDFContent() {
-  // Extract the PDF HTML generation logic from nbiExportPDF
-  const allSelections = NBI.selections;
-  const sections = [{id:'water',label:'Water Treatment'},{id:'cleaning',label:'Cleaning Chemicals'},{id:'fuel',label:'Fuel Treatment'},{id:'cargo',label:'Cargo Hold Cleaning'},{id:'ropes',label:'Mooring Ropes'},{id:'welding',label:'Welding & Gases'},{id:'lubricants',label:'Lubricants'},{id:'refrigerants',label:'Refrigerants'}];
-  let totalProducts = 0;
-  sections.forEach(s=>{ const sel=allSelections[s.id]; if(sel&&!sel.skip) totalProducts+=sel.products.length; });
-  const colors = {water:'#005DAA',cleaning:'#0B4F6C',fuel:'#B45000',cargo:'#2D4A8A',ropes:'#155D32',welding:'#37474F',lubricants:'#B8860B',refrigerants:'#C8102E'};
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>NBI Package — ${NBI.name}</title>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:10px;color:#1A1A2E}.cover{background:#003057;color:#fff;padding:32px}.cover-title{font-size:26px;font-weight:800;line-height:1.2;margin-bottom:6px}.meta-bar{background:#F0F4FA;padding:12px 32px;display:flex;gap:32px;flex-wrap:wrap;border-bottom:2px solid #003057}.meta-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:2px}.meta-value{font-size:12px;font-weight:700;color:#003057}.section{padding:16px 32px;page-break-inside:avoid}.section-header{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;margin-bottom:8px}.section-title{font-size:12px;font-weight:700}table{width:100%;border-collapse:collapse}th{background:#003057;color:#fff;padding:6px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase}td{padding:6px 8px;border-bottom:1px solid #E8EEF8;font-size:10px}tr:nth-child(even) td{background:#F8FAFF}.footer{padding:16px 32px;border-top:2px solid #003057;background:#F0F4FA}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style>
-</head><body>
-<div class="cover"><div style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px">Wilhelmsen Ships Service</div><div class="cover-title">New Building<br>Product Package</div><div style="font-size:12px;color:rgba(255,255,255,.65)">Tailored product selection for ${NBI.name}</div></div>
-<div class="meta-bar">
-  <div><div class="meta-label">Vessel Name</div><div class="meta-value">${NBI.name}</div></div>
-  <div><div class="meta-label">IMO Number</div><div class="meta-value">${NBI.imo}</div></div>
-  <div><div class="meta-label">Vessel Type</div><div class="meta-value" style="text-transform:capitalize">${NBI.type}</div></div>
-  <div><div class="meta-label">Size (DWT)</div><div class="meta-value">${NBI.dwt}</div></div>
-  ${NBI.flag?`<div><div class="meta-label">Flag State</div><div class="meta-value">${NBI.flag}</div></div>`:''}
-  <div><div class="meta-label">Generated</div><div class="meta-value">${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</div></div>
+// ── STEP 4: WATER PRODUCTION SYSTEM ──────────────────────────────────────────
+function wsrStepWaterProd(){
+  const W=WSR.waterprod;
+  const roChems=['Vaptreat (#571364)','Maxi-Vap Plus (#777707)','Multivap (#759340)','RO Scale Control (#777716)','RO Mild Acid Cleaner (#777715)','RO Alkaline Cleaner (#777718)','RO Surfactant Cleaner (#777201)','RO Bisulphite (#777852)','Evaporator Defoamer (#638676)'];
+  const roMakers=['ROCHEM','ENWA','Hydro Marine','EVAC','HITACHI','Others'];
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Water Production System</div>
+  ${wsrLbl('System Type',0)}
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
+    ${['Evaporator','RO System','None'].map(t=>`
+      <button onclick="wsrWPType('${t}')" style="width:100%;padding:13px 16px;border-radius:11px;border:2px solid ${W.sysType===t?WSR_ACC:'var(--border2)'};background:${W.sysType===t?'#EFF6FF':'var(--card)'};font-size:13px;font-weight:700;color:${W.sysType===t?WSR_ACC:'var(--text2)'};cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px">
+        <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${W.sysType===t?WSR_ACC:'var(--border2)'};background:${W.sysType===t?WSR_ACC:'transparent'};display:grid;place-items:center;flex-shrink:0">
+          ${W.sysType===t?'<div style="width:8px;height:8px;border-radius:50%;background:#fff"></div>':''}
+        </div>
+        ${t}
+      </button>`).join('')}
+  </div>
+  ${W.sysType==='RO System'?`
+    ${wsrLbl('RO System Maker')}
+    <div style="background:#EFF6FF;border:2px solid ${WSR_ACC};border-radius:12px;padding:14px;margin-bottom:10px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:${WSR_ACC};margin-bottom:8px">Select RO System Maker</div>
+      <select onchange="WSR.waterprod.roMaker=this.value;wsrRefresh()" style="width:100%;padding:11px 13px;border:2px solid ${WSR_ACC};border-radius:10px;font-size:14px;font-weight:600;background:#fff;color:#111827;box-sizing:border-box;margin-bottom:10px;cursor:pointer">
+        <option value="">— Select Maker —</option>
+        ${roMakers.map(m=>'<option value="'+m+'"'+(W.roMaker===m?' selected':'')+'>'+m+'</option>').join('')}
+      </select>
+      ${W.roMaker==='Others'?'<input value="'+(W.roMakerOther||'')+'" placeholder="Enter RO system maker name..." onblur="WSR.waterprod.roMakerOther=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box">':""}
+    </div>`:''}
+  ${W.sysType&&W.sysType!=='None'?`
+    ${wsrLbl('Chemicals in use')}
+    ${wsrMultiChips(roChems,(W.prods||[]),'wsrWPProd')}
+    ${wsrCard(`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px">${W.sysType==='Evaporator'?'Capacity (ton/day)':'Capacity (m³/day)'}</div>
+          <input type="number" value="${W.capacity||''}" placeholder="—" onblur="WSR.waterprod.capacity=this.value" style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
+        <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Consumption (L/day)</div>
+          <input type="number" value="${W.consumption||''}" placeholder="—" onblur="WSR.waterprod.consumption=this.value" style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Dosing Method</div>
+      <div style="display:flex;gap:6px;margin-bottom:10px">${['Manual','Dosing System'].map(m=>`<button onclick="WSR.waterprod.method='${m}';wsrRefresh()" style="flex:1;padding:8px;border-radius:9px;border:1.5px solid ${W.method===m?WSR_ACC:'var(--border2)'};background:${W.method===m?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:700;color:${W.method===m?WSR_ACC:'var(--text3)'};cursor:pointer">${m}</button>`).join('')}</div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Comments</div>
+      <textarea onblur="WSR.waterprod.comments=this.value" placeholder="Any observations..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:65px;resize:none">${W.comments||''}</textarea>
+    `)}`:''}
+  ${wsrNxtBtn('Continue to Potable Water','wsrNext()')}${wsrSkipBtn()}`;}
+
+function wsrWPType(v){WSR.waterprod.sysType=v;wsrRefresh();}
+function wsrWPProd(p){wsrToggleArr(WSR.waterprod.prods,p);wsrRefresh();}
+
+// ── STEP 5: POTABLE WATER ─────────────────────────────────────────────────────
+function wsrStepPotable(){
+  const P=WSR.potable;
+  const potChems=['Sodium Hypochlorite (#909001)','Potable Water Stabiliser (#777714)','Potable Water Stab 25kg (#624916)','Hydrochloric Acid Potable Grade','Sodium Bisulphate (#909005)','Calcium Hypochlorite','Muriatic Acid Potable Grade'];
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Potable Water System</div>
+  ${wsrLbl('Chemicals in use',0)}
+  ${wsrMultiChips(potChems,(P.prods||[]),'wsrPotProd')}
+  ${wsrCard(`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Other chemical (free text)</div>
+    <input value="${P.freeText||''}" placeholder="Any other chemical not listed..." onblur="WSR.potable.freeText=this.value"
+      style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box">`)}
+  ${wsrLbl('Dosing Method')}
+  <div style="display:flex;gap:6px;margin-bottom:12px">${['Manual','Dosing System','None'].map(m=>`<button onclick="WSR.potable.dosingMethod='${m}';wsrRefresh()" style="flex:1;padding:9px;border-radius:9px;border:1.5px solid ${P.dosingMethod===m?WSR_ACC:'var(--border2)'};background:${P.dosingMethod===m?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:600;color:${P.dosingMethod===m?WSR_ACC:'var(--text3)'};cursor:pointer">${m}</button>`).join('')}</div>
+  ${wsrLbl('Corrosion Shield')}
+  ${wsrCard(`<div onclick="WSR.potable.corrosionShield=!WSR.potable.corrosionShield;wsrRefresh()" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:${P.corrosionShield?'10px':'0'}">
+    <div style="width:22px;height:22px;border-radius:6px;background:${P.corrosionShield?WSR_ACC:'var(--bg3)'};border:1.5px solid ${P.corrosionShield?WSR_ACC:'var(--border2)'};display:grid;place-items:center;flex-shrink:0">${P.corrosionShield?'<i class="ti ti-check" style="font-size:12px;color:#fff"></i>':''}</div>
+    <div><div style="font-size:12px;font-weight:600;color:var(--text)">Corrosion Shield installed on board</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:1px">Inline potable water corrosion inhibitor unit</div></div>
+  </div>
+  ${P.corrosionShield?`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Last filter cartridge change</div>
+    <input type="date" value="${P.lastCartridge||''}" onblur="WSR.potable.lastCartridge=this.value"
+      style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box">`:''}
+  `)}
+  ${wsrLbl('Water Discoloration')}
+  ${wsrCard(`
+    <div onclick="WSR.potable.discoloration=!WSR.potable.discoloration;wsrRefresh()" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:${P.discoloration?'12px':'0'}">
+      <div style="width:22px;height:22px;border-radius:6px;background:${P.discoloration?'#DC2626':'var(--bg3)'};border:1.5px solid ${P.discoloration?'#DC2626':'var(--border2)'};display:grid;place-items:center;flex-shrink:0">
+        ${P.discoloration?'<i class="ti ti-check" style="font-size:12px;color:#fff"></i>':''}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text)">Discoloration observed?</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px">Tap to mark — then add a sample photo below</div>
+      </div>
+    </div>
+    ${P.discoloration?`
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:9px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:600;color:#991B1B;margin-bottom:3px">⚠ Discoloration noted</div>
+        <div style="font-size:10px;color:#B91C1C;line-height:1.5">Document the discolored sample with a photo. This will be included in the PDF report.</div>
+      </div>
+      ${P.discolorPhoto?`
+        <div style="position:relative;border-radius:10px;overflow:hidden;margin-bottom:10px">
+          <img src="${P.discolorPhoto}" style="width:100%;border-radius:10px;display:block;max-height:200px;object-fit:contain;background:var(--bg3)">
+          <button onclick="event.stopPropagation();WSR.potable.discolorPhoto=null;wsrRefresh()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:26px;height:26px;display:grid;place-items:center;cursor:pointer">
+            <i class="ti ti-x" style="font-size:12px;color:#fff"></i>
+          </button>
+          <div style="position:absolute;bottom:6px;left:6px;background:rgba(220,38,38,.85);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:8px">Discolored Sample</div>
+        </div>
+        <label style="display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border:1.5px dashed var(--border2);border-radius:9px;cursor:pointer;color:var(--text3);font-size:11px">
+          <i class="ti ti-camera" style="font-size:14px"></i> Retake photo
+          <input type="file" accept="image/*" style="display:none" onchange="wsrPotableDiscoPhoto(this)">
+        </label>`:`
+        <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;border:2px dashed #FECACA;border-radius:10px;cursor:pointer;background:#FFF5F5">
+          <i class="ti ti-camera-plus" style="font-size:30px;color:#DC2626"></i>
+          <span style="font-size:12px;font-weight:700;color:#DC2626">Add Sample Photo</span>
+          <span style="font-size:10px;color:#9CA3AF;text-align:center">Photograph the discolored water sample</span>
+          <input type="file" accept="image/*" style="display:none" onchange="wsrPotableDiscoPhoto(this)">
+        </label>`}
+    `:''}
+  `)}
+  ${wsrCard(`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Comments</div>
+    <textarea onblur="WSR.potable.comments=this.value" placeholder="Any observations..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:65px;resize:none">${P.comments||''}</textarea>`)}
+  ${wsrNxtBtn('Continue to Seawater System','wsrNext()')}${wsrSkipBtn()}`;}
+
+function wsrPotProd(p){wsrToggleArr(WSR.potable.prods,p);wsrRefresh();}
+function wsrPotableDiscoPhoto(input){
+  if(!input.files||!input.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{WSR.potable.discolorPhoto=e.target.result;wsrRefresh();};
+  r.readAsDataURL(input.files[0]);
+}
+
+// ── STEP 6: SEAWATER SYSTEM ───────────────────────────────────────────────────
+function wsrStepSeawater(){
+  const S=WSR.seawater;
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px">Seawater System</div>
+  ${wsrLbl('Chemicals in use',0)}
+  ${wsrMultiChips(['Bioguard Plus (#778918)','Sodium Hypochlorite (#909001)'],(S.prods||[]),'wsrSWProd')}
+  ${wsrCard(`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Others (free text)</div>
+    <input value="${S.swOther||''}" placeholder="Other chemicals used..." onblur="WSR.seawater.swOther=this.value"
+      style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box">`)}
+  ${wsrLbl('Dosing Method')}
+  <div style="display:flex;gap:6px;margin-bottom:10px">${['Manual','Dosing System','None'].map(m=>`<button onclick="WSR.seawater.dosingMethod='${m}';wsrRefresh()" style="flex:1;padding:9px;border-radius:9px;border:1.5px solid ${S.dosingMethod===m?WSR_ACC:'var(--border2)'};background:${S.dosingMethod===m?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:600;color:${S.dosingMethod===m?WSR_ACC:'var(--text3)'};cursor:pointer">${m}</button>`).join('')}</div>
+  ${wsrCard(`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Comments</div>
+    <textarea onblur="WSR.seawater.comments=this.value" placeholder="Any observations..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:60px;resize:none">${S.comments||''}</textarea>`)}
+  ${wsrNxtBtn('Continue to Waterproof','wsrNext()')}${wsrSkipBtn()}`;}
+function wsrSWProd(p){wsrToggleArr(WSR.seawater.prods,p);wsrRefresh();}
+
+// ── STEP 7: WATERPROOF ────────────────────────────────────────────────────────
+function wsrStepWaterproof(){
+  const WP=WSR.waterproof;
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px">Waterproof Software</div>
+  ${wsrCard(`
+    <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px">Is Waterproof software in use on board?</div>
+    ${wsrYN(WP.inUse,'wsrWPInUse')}
+    ${WP.inUse==='Yes'?`
+      ${wsrLbl('Version')}
+      <div style="display:flex;gap:6px;margin-bottom:10px">${['WP 3.0 (Online)','WP 2.x (Desktop)'].map(v=>`<button onclick="WSR.waterproof.version='${v}';wsrRefresh()" style="flex:1;padding:9px;border-radius:9px;border:1.5px solid ${WP.version===v?WSR_ACC:'var(--border2)'};background:${WP.version===v?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:600;color:${WP.version===v?WSR_ACC:'var(--text3)'};cursor:pointer">${v}</button>`).join('')}</div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Comments</div>
+      <textarea onblur="WSR.waterproof.comments=this.value" placeholder="Version details, any issues, training provided..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:65px;resize:none">${WP.comments||''}</textarea>`:''}
+  `)}
+  ${wsrNxtBtn('Continue to Ballast Water','wsrNext()')}`;}
+function wsrWPInUse(v){WSR.waterproof.inUse=v;wsrRefresh();}
+
+// ── STEP 8: BALLAST WATER ─────────────────────────────────────────────────────
+function wsrStepBallast(){
+  const B=WSR.ballast;
+  const bwChems=['Ballastguard STS 30 (#779162)','Ballastguard SBS 40 (#779166)','Ballastguard SMBS Solid (#779214)','Ballastguard STS Solid (#779212)'];
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Ballast Water Treatment System</div>
+  ${wsrCard(`
+    <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">System Maker / Brand</div>
+    <input value="${B.maker||''}" placeholder="e.g. Alfa Laval, Wärtsilä, OceanSaver, DESMI..." onblur="WSR.ballast.maker=this.value"
+      style="width:100%;padding:9px 12px;border:1.5px solid ${WSR_ACC}50;border-radius:10px;font-size:13px;font-weight:600;background:var(--bg3);color:var(--text);box-sizing:border-box">`)}
+  ${wsrLbl('System Type')}
+  ${wsrChips(['UV','Electrochlorination','Chemical Injection','UV + Chemical','Other'],B.sysType,'wsrBallastType')}
+  ${wsrLbl('Chemicals in use')}
+  ${wsrMultiChips(bwChems,(B.chemicals||[]),'wsrBallastChem')}
+  ${wsrCard(`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Others (free text)</div>
+    <input value="${B.ballastOther||''}" placeholder="Other ballast chemical..." onblur="WSR.ballast.ballastOther=this.value"
+      style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box">`)}
+  ${wsrLbl('Chemical Type')}
+  ${wsrChips(['Solid','Liquid','Both'],B.chemType,'wsrBallastChemType')}
+  ${wsrLbl('Dosing Unit')}
+  ${wsrCard(`<div onclick="WSR.ballast.dosingUnit=!WSR.ballast.dosingUnit;wsrRefresh()" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:${B.dosingUnit?'10px':'0'}">
+    <div style="width:22px;height:22px;border-radius:6px;background:${B.dosingUnit?WSR_ACC:'var(--bg3)'};border:1.5px solid ${B.dosingUnit?WSR_ACC:'var(--border2)'};display:grid;place-items:center;flex-shrink:0">${B.dosingUnit?'<i class="ti ti-check" style="font-size:12px;color:#fff"></i>':''}</div>
+    <div style="font-size:12px;font-weight:600;color:var(--text)">Dosing unit installed</div>
+  </div>
+
+  `)}
+  ${wsrCard(`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Comments</div>
+    <textarea onblur="WSR.ballast.comments=this.value" placeholder="Any observations..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:65px;resize:none">${B.comments||''}</textarea>`)}
+  ${wsrNxtBtn('Continue to Equipment Photos','wsrNext()')}${wsrSkipBtn()}`;}
+function wsrBallastType(v){WSR.ballast.sysType=v;wsrRefresh();}
+function wsrBallastChem(p){wsrToggleArr(WSR.ballast.chemicals,p);wsrRefresh();}
+function wsrBallastChemType(v){WSR.ballast.chemType=v;wsrRefresh();}
+
+// ── STEP 9: EQUIPMENT PHOTOS ──────────────────────────────────────────────────
+function wsrStepPhotos(){
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Equipment Photos</div>
+  <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:9px;padding:9px 12px;font-size:11px;color:#1E40AF;margin-bottom:12px;line-height:1.5">
+    Tap any photo to add inspection status and comments. These will print in the PDF report.
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    ${(WSR.photos||[]).map((ph,i)=>{
+      const sc={'OK':'#155D32','Damaged':'#991B1B','Needs Replacement':'#92400E','Needs Attention':'#78350F','Not Inspected':'#374151'}[ph.status||'Not Inspected']||'#374151';
+      const sb={'OK':'#F0FDF4','Damaged':'#FEF2F2','Needs Replacement':'#FFFBEB','Needs Attention':'#FFFBEB','Not Inspected':'#F9FAFB'}[ph.status||'Not Inspected']||'#F9FAFB';
+      return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+        <div style="position:relative;aspect-ratio:4/3;background:var(--bg3);cursor:pointer" onclick="wsrPhotoPopup(${i})">
+          <img src="${ph.data}" style="width:100%;height:100%;object-fit:cover;display:block">
+          <div style="position:absolute;top:5px;left:5px;background:${sc};color:#fff;font-size:8px;font-weight:700;padding:2px 7px;border-radius:10px">${ph.status||'Not Inspected'}</div>
+          <div style="position:absolute;top:5px;right:5px;background:rgba(0,0,0,.45);border:none;border-radius:50%;width:22px;height:22px;display:grid;place-items:center;cursor:pointer" onclick="event.stopPropagation();WSR.photos.splice(${i},1);wsrRefresh()"><i class="ti ti-x" style="font-size:10px;color:#fff"></i></div>
+        </div>
+        <div style="padding:7px 8px"><div style="font-size:10px;font-weight:700;color:var(--text);margin-bottom:3px">${ph.label}</div>
+        <div style="font-size:9px;color:var(--text3);line-height:1.4">${ph.comment||'Tap to add inspection notes'}</div></div>
+      </div>`;}).join('')}
+    <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1.5px dashed var(--border2);border-radius:10px;aspect-ratio:4/3;cursor:pointer;background:var(--bg3)">
+      <i class="ti ti-camera-plus" style="font-size:24px;color:var(--text3)"></i>
+      <span style="font-size:10px;color:var(--text3);font-weight:600">Add Photo</span>
+      <input type="file" accept="image/*" multiple style="display:none" onchange="wsrAddPhotos(this,null)">
+    </label>
+  </div>
+  <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:7px">Quick labels:</div>
+  <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px">
+    ${['Sample Cooler','Dosing Unit','Chemical Drums','Water Sample','Test Results','Dosing Pump','Boiler Room','Engine Room','Equipment Condition','Corrosion Shield','RO Membrane','Ballast System'].map(lbl=>{
+      const used=(WSR.photos||[]).some(p=>p.label===lbl);
+      return `<label style="padding:6px 12px;border-radius:16px;border:2px solid ${used?WSR_ACC:'var(--border2)'};background:${used?'#EFF6FF':'var(--card)'};font-size:10px;font-weight:700;color:${used?WSR_ACC:'var(--text3)'};cursor:pointer;display:flex;align-items:center;gap:5px">
+        <i class="ti ti-${used?'check':'camera'}" style="font-size:11px"></i> ${lbl}${used?` <span style="font-size:9px;opacity:.7">(${(WSR.photos||[]).filter(p=>p.label===lbl).length})</span>`:''}
+        <input type="file" accept="image/*" style="display:none" onchange="wsrAddPhotos(this,'${lbl}')">
+      </label>`;}).join('')}
+  </div>
+  ${wsrNxtBtn('Continue to ROB','wsrNext()')}`;
+}
+
+function wsrAddPhotos(input,label){
+  if(!WSR.photos)WSR.photos=[];
+  Array.from(input.files).forEach(file=>{
+    const r=new FileReader();
+    r.onload=e=>{WSR.photos.push({data:e.target.result,label:label||file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' '),name:file.name,status:'Not Inspected',comment:''});wsrRefresh();};
+    r.readAsDataURL(file);
+  });
+}
+
+// ── STEP 10: ROB ─────────────────────────────────────────────────────────────
+function wsrStepROB(){
+  const allProds=wsrCollectAllProds();
+  if(WSR.rob.items.length!==allProds.length){
+    while(WSR.rob.items.length<allProds.length) WSR.rob.items.push({prod:'',qty:''});
+  }
+  if(!WSR.rob.mode) WSR.rob.mode='manual';
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">ROB — Remaining on Board</div>
+  <div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5">Choose how to record the remaining stock on board.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+    <div onclick="WSR.rob.mode='manual';wsrRefresh()" style="padding:14px 12px;border-radius:12px;border:2px solid ${WSR.rob.mode==='manual'?'#1D6FA4':'var(--border2)'};background:${WSR.rob.mode==='manual'?'#EFF6FF':'var(--card)'};cursor:pointer;text-align:center">
+      <i class="ti ti-list-check" style="font-size:24px;color:${WSR.rob.mode==='manual'?'#1D6FA4':'var(--text3)'}"></i>
+      <div style="font-size:12px;font-weight:700;color:${WSR.rob.mode==='manual'?'#1D6FA4':'var(--text2)'};margin-top:6px">Enter Manually</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px;line-height:1.4">Type ROB for each product selected</div>
+    </div>
+    <div onclick="WSR.rob.mode='photo';wsrRefresh()" style="padding:14px 12px;border-radius:12px;border:2px solid ${WSR.rob.mode==='photo'?'#1D6FA4':'var(--border2)'};background:${WSR.rob.mode==='photo'?'#EFF6FF':'var(--card)'};cursor:pointer;text-align:center">
+      <i class="ti ti-camera" style="font-size:24px;color:${WSR.rob.mode==='photo'?'#1D6FA4':'var(--text3)'}"></i>
+      <div style="font-size:12px;font-weight:700;color:${WSR.rob.mode==='photo'?'#1D6FA4':'var(--text2)'};margin-top:6px">Photo of ROB List</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px;line-height:1.4">Take a photo of the ROB paper</div>
+    </div>
+  </div>
+  ${WSR.rob.mode==='photo'?`
+  <div style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:14px;margin-bottom:12px;text-align:center">
+    <i class="ti ti-file-text" style="font-size:32px;color:#1D6FA4;margin-bottom:8px;display:block"></i>
+    <div style="font-size:12px;font-weight:700;color:#1E40AF;margin-bottom:4px">Photograph your ROB sheet</div>
+    <div style="font-size:11px;color:#6B7280;margin-bottom:12px;line-height:1.5">Take a photo of the vessel's ROB document or chemical store list — it will be included in the PDF report</div>
+    ${WSR.rob.robPhoto?`<div style="position:relative;border-radius:10px;overflow:hidden;margin-bottom:10px">
+      <img src="${WSR.rob.robPhoto}" style="width:100%;border-radius:10px;display:block;max-height:200px;object-fit:contain;background:var(--bg3)">
+      <button onclick="WSR.rob.robPhoto=null;wsrRefresh()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:24px;height:24px;display:grid;place-items:center;cursor:pointer"><i class="ti ti-x" style="font-size:11px;color:#fff"></i></button>
+    </div>`:''}
+    <label style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#1D6FA4;border-radius:10px;cursor:pointer;color:#fff;font-size:12px;font-weight:700">
+      <i class="ti ti-camera" style="font-size:14px"></i> ${WSR.rob.robPhoto?'Retake Photo':'Take / Upload Photo'}
+      <input type="file" accept="image/*" style="display:none" onchange="wsrROBPhoto(this)">
+    </label>
+  </div>`:``}
+  ${WSR.rob.mode==='manual'?`<div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.5">Enter remaining stock (litres or kg) for each product selected in this report.</div>
+  ${allProds.length?allProds.map((p,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.3">${p}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
+      <input type="number" min="0" value="${(WSR.rob.items[i]&&WSR.rob.items[i].qty)||''}" placeholder="0"
+        onblur="WSR.rob.items[${i}]={prod:${JSON.stringify(p)},qty:this.value}"
+        style="width:75px;padding:7px 9px;border:1.5px solid var(--border2);border-radius:8px;font-size:13px;font-weight:600;background:var(--card);color:var(--text);text-align:right">
+      <span style="font-size:11px;color:var(--text3);font-weight:600">L/kg</span>
+    </div>
+  </div>`).join(''):`<div style="background:var(--bg3);border-radius:10px;padding:16px;text-align:center;color:var(--text3);font-size:12px;margin-bottom:10px">No products selected yet — go back and select products in each section</div>`}
+  ${wsrLbl('Additional Products (not in report)')}
+  ${wsrCard(`
+    ${(WSR.rob.extraItems||[]).map((ei,i)=>`<div style="display:flex;gap:6px;margin-bottom:7px;align-items:center">
+      <input value="${ei.prod||''}" placeholder="Product name / part number" onblur="WSR.rob.extraItems[${i}].prod=this.value"
+        style="flex:1;padding:7px 9px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--bg3);color:var(--text)">
+      <input type="number" value="${ei.qty||''}" placeholder="L/kg" onblur="WSR.rob.extraItems[${i}].qty=this.value"
+        style="width:70px;padding:7px 8px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);text-align:right">
+      <button onclick="WSR.rob.extraItems.splice(${i},1);wsrRefresh()" style="background:var(--red-bg);border:none;border-radius:6px;width:26px;height:26px;display:grid;place-items:center;cursor:pointer">
+        <i class="ti ti-x" style="font-size:10px;color:var(--red)"></i>
+      </button>
+    </div>`).join('')}
+    <button onclick="if(!WSR.rob.extraItems)WSR.rob.extraItems=[];WSR.rob.extraItems.push({prod:'',qty:''});wsrRefresh()"
+      style="width:100%;padding:9px;border:1.5px dashed var(--border2);border-radius:9px;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;margin-top:4px">
+      <i class="ti ti-plus" style="font-size:11px;vertical-align:-1px"></i> Add product
+    </button>`)}
+  `:''}
+  ${wsrNxtBtn('Continue to Comments','wsrNext()')}`;
+}
+
+function wsrROBPhoto(input){
+  if(!input.files||!input.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{WSR.rob.robPhoto=e.target.result;wsrRefresh();};
+  r.readAsDataURL(input.files[0]);
+}
+
+function wsrCollectAllProds(){
+  const all=new Set();
+  (WSR.boilerProds||[]).forEach(p=>all.add(p));
+  (WSR.coolProds||[]).forEach(p=>all.add(p));
+  (WSR.waterprod.prods||[]).forEach(p=>all.add(p));
+  (WSR.potable.prods||[]).forEach(p=>all.add(p));
+  if(WSR.potable.freeText&&WSR.potable.freeText.trim())all.add(WSR.potable.freeText.trim());
+  (WSR.seawater.prods||[]).forEach(p=>all.add(p));
+  if(WSR.seawater.swOther&&WSR.seawater.swOther.trim())all.add(WSR.seawater.swOther.trim());
+  (WSR.ballast.chemicals||[]).forEach(p=>all.add(p));
+  if(WSR.ballast.ballastOther&&WSR.ballast.ballastOther.trim())all.add(WSR.ballast.ballastOther.trim());
+  return [...all];
+}
+
+// ── STEP 11: COMMENTS ─────────────────────────────────────────────────────────
+function wsrStepComments(){
+  const ba=wsrBoilerAlerts(); const ca=wsrCoolAlerts();
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Comments & General Notes</div>
+  ${(ba||ca)?`<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 12px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:700;color:#991B1B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">⚠ Auto-generated alerts from all readings</div>
+    ${ba}${ca}
+  </div>`:''}
+  ${wsrCard(`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">General Notes & Recommendations</div>
+    <textarea id="wsr-gen-comment" onblur="WSR.comments.general=this.value"
+      placeholder="Test kit condition, items handed over, training provided, general observations..."
+      style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:100px;resize:none">${WSR.comments.general||''}</textarea>`)}
+  ${wsrNxtBtn('Preview & Generate PDF','wsrCommentsNext()')}`;
+}
+function wsrCommentsNext(){const el=document.getElementById('wsr-gen-comment');if(el)WSR.comments.general=el.value;wsrNext();}
+
+// ── STEP 12: PREVIEW ─────────────────────────────────────────────────────────
+function wsrStepPreview(){
+  const bRows=WSR.boiler.filter(r=>r.name||r.ph||r.pAlk||r.chloride||r.deha||r.conductivity);
+  const cRows=WSR.cooling.filter(r=>r.name||r.nitrite||r.ph||r.chloride||r.conductivity);
+  const allProds=wsrCollectAllProds();
+  const robItems=[...(WSR.rob.items||[]).filter(x=>x&&x.qty),...(WSR.rob.extraItems||[]).filter(x=>x.prod&&x.qty)];
+  return `
+  <div style="background:linear-gradient(135deg,${WSR_ACC},#1A4A7A);border-radius:14px;padding:14px;margin-bottom:12px">
+    <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px">REPORT READY</div>
+    <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:4px">${WSR.vessel}</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.65)">IMO ${WSR.imo} · ${WSR.date} · ${WSR.port||'—'}</div>
+    <div style="margin-top:9px;background:rgba(255,255,255,.1);border-radius:8px;padding:8px 11px;font-size:11px;color:rgba(255,255,255,.85)">
+      ${bRows.length} boiler · ${cRows.length} cooling · ${WSR.photos.length} photos · ${robItems.length} ROB items
+    </div>
+  </div>
+  <button onclick="wsrExportPDF()" style="width:100%;padding:14px;background:${WSR_ACC};border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px">
+    <i class="ti ti-file-download" style="font-size:16px"></i> Download PDF Report
+  </button>
+  <button onclick="wsrEmailReport()" style="width:100%;padding:12px;background:transparent;border:1.5px solid ${WSR_ACC};border-radius:12px;color:${WSR_ACC};font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px">
+    <i class="ti ti-mail" style="font-size:15px"></i> Email Report
+  </button>
+  <button onclick="hWSR();wsrRefresh()" style="width:100%;padding:10px;background:transparent;border:1px solid var(--border2);border-radius:10px;color:var(--text3);font-size:12px;cursor:pointer">Start New Report</button>`;}
+
+// ── PDF EXPORT ────────────────────────────────────────────────────────────────
+function wsrExportPDF(){
+  const bRows=WSR.boiler.filter(r=>r.name||r.ph||r.pAlk||r.chloride||r.deha||r.conductivity);
+  const cRows=WSR.cooling.filter(r=>r.name||r.nitrite||r.ph||r.chloride||r.conductivity);
+  const W=WSR.waterprod; const P=WSR.potable; const S=WSR.seawater;
+  const B=WSR.ballast; const WP=WSR.waterproof;
+  const BL=WSR.boilerLimits; const CL=WSR.coolingLimits;
+  const allProds=wsrCollectAllProds();
+  const robItems=[...(WSR.rob.items||[]).filter(x=>x&&x.qty),...(WSR.rob.extraItems||[]).filter(x=>x.prod&&x.qty)];
+
+  // Build executive summary of issues
+  const issues=[];
+  bRows.forEach(r=>{
+    [['ph','pH',BL.ph],['pAlk','P.Alkalinity',BL.pAlk],['chloride','Chloride',BL.chloride],['deha','DEHA',BL.deha],['conductivity','Conductivity',BL.conductivity]].forEach(([fld,lbl,cl])=>{
+      if(!r[fld])return;const st=wsrSt(r[fld],cl.lo,cl.hi);
+      if(st!=='ok'&&st!=='na')issues.push({sys:'Boiler: '+r.name,param:lbl,val:r[fld],st,msg:wsrBoilerMsg(fld,st)});
+    });
+  });
+  cRows.forEach(r=>{
+    [['nitrite','Nitrite',CL.nitrite],['ph','pH',CL.ph],['chloride','Chloride',CL.chloride],['conductivity','Conductivity',CL.conductivity]].forEach(([fld,lbl,cl])=>{
+      if(!r[fld])return;const st=wsrSt(r[fld],cl.lo,cl.hi);
+      if(st!=='ok'&&st!=='na')issues.push({sys:'Cooling: '+r.name,param:lbl,val:r[fld],st,msg:wsrCoolMsg(fld,st)});
+    });
+    if(r.oilContam==='Yes')issues.push({sys:'Cooling: '+r.name,param:'Oil Contamination',val:'Yes',st:'high',msg:'Investigate source of oil ingress. Drain and flush if necessary.'});
+  });
+
+  function stStyle(val,lo,hi){const s=wsrSt(val,lo,hi);if(s==='ok')return'color:#1D4ED8;font-weight:700';if(s==='low')return'color:#DC2626;font-weight:700';if(s==='high')return'color:#D97706;font-weight:700';return'color:#6B7280';}
+  function stLbl(val,lo,hi){const s=wsrSt(val,lo,hi);if(s==='ok')return'Within';if(s==='low')return'↓ Low';if(s==='high')return'↑ High';return'—';}
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>WSS PSE Report — ${WSR.vessel}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:9.5px;color:#111827;background:#fff}
+/* COVER */
+.cover{background:#003057}
+.cover-top{padding:26px 36px 22px;display:flex;justify-content:space-between;align-items:flex-start}
+.wss-logo{font-size:16px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.wss-logo span{color:#60A5FA}
+.cover-report-type{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:3px}
+.cover-date{text-align:right;color:rgba(255,255,255,.5);font-size:10px;line-height:1.9}
+.cover-vessel-bar{background:#1D4ED8;padding:20px 36px 18px}
+.cover-vname{font-size:28px;font-weight:800;color:#fff;margin-bottom:5px}
+.cover-vsub{font-size:12px;color:rgba(255,255,255,.75);line-height:1.9}
+/* META BAR */
+.meta-bar{background:#EFF6FF;padding:12px 36px;display:flex;gap:24px;flex-wrap:wrap;border-bottom:3px solid #003057}
+.mi .ml{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6B7280;margin-bottom:2px}
+.mi .mv{font-size:13px;font-weight:700;color:#003057}
+/* EXECUTIVE SUMMARY */
+.exec-box{margin:16px 36px;border:1.5px solid #FCA5A5;border-radius:10px;background:#FEF2F2}
+.exec-title{padding:10px 14px 8px;background:#DC2626;border-radius:8px 8px 0 0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#fff}
+.exec-issue{padding:8px 14px;border-bottom:1px solid #FECACA;display:flex;gap:12px;align-items:flex-start}
+.exec-issue:last-child{border-bottom:none}
+.exec-sys{font-size:11px;font-weight:700;color:#991B1B;min-width:130px;flex-shrink:0;line-height:1.5}
+.exec-detail{font-size:11px;color:#7F1D1D;line-height:1.6}
+/* SECTION */
+.section{padding:14px 36px;page-break-inside:avoid}
+.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:7px;border-bottom:2.5px solid #003057}
+.sec-icon{width:26px;height:26px;border-radius:5px;background:#003057;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:#fff;font-weight:800;letter-spacing:-.3px}
+.sec-title{font-size:15px;font-weight:700;color:#003057}
+.sec-sub{font-size:9px;color:#6B7280;margin-left:auto;max-width:260px;text-align:right;line-height:1.5}
+table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:10px}
+th{background:#003057;color:#fff;padding:7px 9px;text-align:left;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:9px}
+td{padding:7px 9px;border-bottom:1px solid #DBEAFE;vertical-align:middle}
+tr:nth-child(even) td{background:#EFF6FF}
+.ok{color:#1D4ED8;font-weight:700}.low{color:#DC2626;font-weight:700}.hi{color:#D97706;font-weight:700}
+.alerts-box{background:#FEF2F2;border:1.5px solid #FECACA;border-radius:8px;padding:10px 14px;margin:8px 0 10px}
+.alert-item{font-size:10.5px;color:#991B1B;margin-bottom:6px;line-height:1.6;padding:5px 10px;background:rgba(255,255,255,.6);border-radius:5px;border-left:3px solid #EF4444}
+.alert-item b{color:#7F1D1D}
+.info-grid{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:10px;padding:10px 14px;background:#EFF6FF;border-radius:8px;border-left:4px solid #003057}
+.ig .il{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6B7280;margin-bottom:2px}
+.ig .iv{font-size:12px;font-weight:700;color:#003057}
+.chip{display:inline-block;padding:3px 10px;border-radius:12px;font-size:9.5px;font-weight:700;margin:2px 3px}
+.chip-blue{background:#DBEAFE;color:#1E40AF}
+.chip-ok{background:#DCFCE7;color:#166534}
+.photo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:10px}
+.pc{border:1.5px solid #BFDBFE;border-radius:8px;overflow:hidden;page-break-inside:avoid}
+.pc img{width:100%;display:block;max-height:150px;object-fit:cover}
+.pi{padding:7px 10px;background:#fff}
+.pl{font-size:10px;font-weight:700;color:#003057;margin-bottom:4px}
+.ps{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;margin-bottom:4px}
+.pc-note{font-size:9.5px;color:#4B5563;line-height:1.5}
+.rob-row td:last-child{font-weight:700;color:#1D4ED8;text-align:right;font-size:12px}
+.disclaimer{font-size:9px;color:#9CA3AF;line-height:1.7;padding:12px 36px;border-top:1px solid #DBEAFE}
+.footer{padding:12px 36px;background:#003057;display:flex;justify-content:space-between;align-items:center}
+.fb{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff}
+.fs{font-size:9px;color:rgba(255,255,255,.55);margin-top:2px}
+.fr{font-size:9px;color:rgba(255,255,255,.55);text-align:right;line-height:1.7}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{margin:10mm}}
+</style></head><body>
+
+<div class="cover">
+  <div class="cover-top">
+    <div><div class="wss-logo"><span>W</span>ilhelmsen Ships Service</div><div class="cover-report-type">PSE Water Treatment Service Report</div></div>
+    <div class="cover-date">Date: ${WSR.date}<br>Order No: —</div>
+  </div>
+  <div class="cover-vessel-bar">
+    <div class="cover-vname">${WSR.vessel}</div>
+    <div class="cover-vsub">IMO ${WSR.imo} &nbsp;·&nbsp; ${WSR.type||'—'} &nbsp;·&nbsp; ${WSR.customer||'—'} &nbsp;·&nbsp; ${WSR.port||'—'}</div>
+  </div>
 </div>
-<div style="background:#003057;color:#fff;padding:8px 32px;font-size:10px;font-weight:600">${totalProducts} products selected</div>
-${sections.map(sec=>{
-  const sel=allSelections[sec.id];
-  if(!sel) return '';
-  const col=colors[sec.id]||'#003057';
-  if(sel.skip) return `<div class="section"><div class="section-header" style="background:${col}12"><div class="section-title" style="color:${col}">${sec.label}</div><div style="margin-left:auto;font-size:9px;color:#999">Not required</div></div></div>`;
-  if(!sel.products.length) return '';
-  return `<div class="section"><div class="section-header" style="background:${col}12"><div class="section-title" style="color:${col}">${sec.label}</div><div style="margin-left:auto;font-size:9px;font-weight:700;color:${col}">${sel.products.length} products</div></div>
-  <table><tr><th style="width:35%">Product</th><th style="width:15%">Part No.</th><th style="width:15%">Brand</th><th style="width:30%">Notes</th><th style="width:5%;text-align:center">Qty</th></tr>
-  ${sel.products.map(p=>`<tr><td style="font-weight:600">${p.name}</td><td style="font-family:monospace;color:#666">${p.p||'—'}</td><td>${p.brand}</td><td style="color:#555">${p.note||''}</td><td style="text-align:center;font-weight:700">${p.qty||1}</td></tr>`).join('')}
-  </table></div>`;
-}).join('')}
-<div class="footer" style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#003057">Wilhelmsen Ships Service</div><div style="font-size:8px;color:#888">wilhelmsen.com · omar.labib@wilhelmsen.com</div></div><div style="font-size:8px;color:#888;text-align:right">NBI Package for ${NBI.name} · IMO ${NBI.imo}<br>Generated ${new Date().toLocaleDateString('en-GB')}</div></div>
+
+<div class="meta-bar">
+  <div class="mi"><div class="ml">Vessel</div><div class="mv">${WSR.vessel}</div></div>
+  <div class="mi"><div class="ml">IMO</div><div class="mv">${WSR.imo}</div></div>
+  <div class="mi"><div class="ml">Date</div><div class="mv">${WSR.date}</div></div>
+  <div class="mi"><div class="ml">Port</div><div class="mv">${WSR.port||'—'}</div></div>
+  <div class="mi"><div class="ml">Customer</div><div class="mv">${WSR.customer||'—'}</div></div>
+  <div class="mi"><div class="ml">Chief Engineer</div><div class="mv">${WSR.chiefEngineer||'—'}</div></div>
+  <div class="mi"><div class="ml">WSS PSE</div><div class="mv">${WSR.pse||'—'}</div></div>
+  <div class="mi"><div class="ml">Vessel Type</div><div class="mv">${WSR.type||'—'}</div></div>
+</div>
+
+${issues.length?`<div class="exec-box">
+  <div class="exec-title">⚠ Executive Summary — ${issues.length} Issue${issues.length>1?'s':''} Identified</div>
+  ${issues.map(iss=>`<div class="exec-issue">
+    <div class="exec-sys">${iss.sys}<br><span style="font-size:8px;color:#991B1B">${iss.param}: ${iss.val} — ${iss.st.toUpperCase()}</span></div>
+    <div class="exec-detail">${iss.msg}</div>
+  </div>`).join('')}
+</div>`:`<div style="margin:12px 30px;padding:8px 12px;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;font-size:9.5px;color:#166534;font-weight:700">✓ All measured parameters are within control limits</div>`}
+
+${bRows.length?`<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">BW</div><div class="sec-title">Boiler Water Systems</div><div class="sec-sub">Limits: pH ${BL.ph.lo}–${BL.ph.hi} · P.Alk ${BL.pAlk.lo}–${BL.pAlk.hi} ppm · DEHA ${BL.deha.lo}–${BL.deha.hi} ppm · Cl &lt;${BL.chloride.hi} ppm · Cond ${BL.conductivity.lo}–${BL.conductivity.hi} µS</div></div>
+  <table>
+    <tr><th>System</th><th>pH</th><th>P.Alk (ppm CaCO₃)</th><th>Cl (ppm)</th><th>DEHA (ppm)</th><th>Cond (µS)</th><th>Cap. m³</th><th>Make-up L/d</th><th>Dosing</th><th>Blowdown</th><th>Appearance</th></tr>
+    ${bRows.map(r=>`<tr>
+      <td style="font-weight:700">${r.name||'Boiler System'}</td>
+      <td style="${stStyle(r.ph,BL.ph.lo,BL.ph.hi)}">${r.ph||'—'} <span style="font-size:7px">${r.ph?stLbl(r.ph,BL.ph.lo,BL.ph.hi):''}</span></td>
+      <td style="${stStyle(r.pAlk,BL.pAlk.lo,BL.pAlk.hi)}">${r.pAlk||'—'} <span style="font-size:7px">${r.pAlk?stLbl(r.pAlk,BL.pAlk.lo,BL.pAlk.hi):''}</span></td>
+      <td style="${stStyle(r.chloride,BL.chloride.lo,BL.chloride.hi)}">${r.chloride||'—'}</td>
+      <td style="${stStyle(r.deha,BL.deha.lo,BL.deha.hi)}">${r.deha||'—'} <span style="font-size:7px">${r.deha?stLbl(r.deha,BL.deha.lo,BL.deha.hi):''}</span></td>
+      <td style="${stStyle(r.conductivity,BL.conductivity.lo,BL.conductivity.hi)}">${r.conductivity||'—'}</td>
+      <td>${r.capacity||'—'}</td><td>${r.makeup||'—'}</td>
+      <td>${r.dosing||'Manual'}</td><td>${r.blowdown||'—'}</td><td>${r.appearance||'—'}</td>
+    </tr>`).join('')}
+  </table>
+  ${WSR.boilerProds&&WSR.boilerProds.length?`<div style="margin:4px 0 6px"><span style="font-size:8px;color:#6B7280;font-weight:700">Products: </span>${WSR.boilerProds.map(p=>`<span class="chip chip-blue">${p}</span>`).join('')}</div>`:''}
+  <div style="display:flex;gap:16px;margin:4px 0 6px">
+    <span style="font-size:9px"><b>Right Test Kit:</b> ${WSR.boilerTestKit||'—'}</span>
+    <span style="font-size:9px"><b>Reagent Within Expiry:</b> ${WSR.boilerReagent||'—'}</span>
+  </div>
+  ${wsrBoilerAlerts()?`<div class="alerts-box"><div style="font-size:9px;font-weight:700;color:#991B1B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">⚠ Boiler Water Alerts & Recommended Actions</div>${bRows.map(r=>{
+    const alerts=[];
+    [['ph','pH',BL.ph],['pAlk','P.Alkalinity',BL.pAlk],['chloride','Chloride',BL.chloride],['deha','DEHA',BL.deha],['conductivity','Conductivity',BL.conductivity]].forEach(([fld,lbl,cl])=>{
+      if(!r[fld])return;const st=wsrSt(r[fld],cl.lo,cl.hi);
+      if(st!=='ok'&&st!=='na')alerts.push(`<div class="alert-item"><b>${r.name||'Boiler System'} — ${lbl} ${st.toUpperCase()} (${r[fld]}):</b> ${wsrBoilerMsg(fld,st)}</div>`);
+    });
+    return alerts.join('');}).join('')}</div>`:''}
+</div>`:''}
+
+${cRows.length?`<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">CW</div><div class="sec-title">Cooling Water Systems</div><div class="sec-sub">Limits: Nitrite ${CL.nitrite.lo}–${CL.nitrite.hi} · pH ${CL.ph.lo}–${CL.ph.hi} · Cl &lt;${CL.chloride.hi} ppm · Cond ${CL.conductivity.lo}–${CL.conductivity.hi} µS</div></div>
+  <table>
+    <tr><th>System</th><th>Nitrite (ppm)</th><th>pH</th><th>Cl (ppm)</th><th>Conductivity</th><th>P.Alk</th><th>Cap. m³</th><th>Make-up</th><th>Dosing</th><th>Appearance</th><th>Oil?</th><th>Test Kit</th><th>Reagent OK</th></tr>
+    ${cRows.map(r=>`<tr>
+      <td style="font-weight:700">${r.name||'Cooling System'}</td>
+      <td style="${stStyle(r.nitrite,CL.nitrite.lo,CL.nitrite.hi)}">${r.nitrite||'—'} <span style="font-size:7px">${r.nitrite?stLbl(r.nitrite,CL.nitrite.lo,CL.nitrite.hi):''}</span></td>
+      <td style="${stStyle(r.ph,CL.ph.lo,CL.ph.hi)}">${r.ph||'—'} <span style="font-size:7px">${r.ph?stLbl(r.ph,CL.ph.lo,CL.ph.hi):''}</span></td>
+      <td style="${stStyle(r.chloride,CL.chloride.lo,CL.chloride.hi)}">${r.chloride||'—'}</td>
+      <td style="${stStyle(r.conductivity,CL.conductivity.lo,CL.conductivity.hi)}">${r.conductivity||'—'}</td>
+      <td>${r.pAlk||'—'}</td><td>${r.capacity||'—'}</td><td>${r.makeup||'—'}</td>
+      <td>${r.dosing||'—'}</td><td>${r.appearance||'—'}</td>
+      <td style="${r.oilContam==='Yes'?'color:#DC2626;font-weight:700':''}">${r.oilContam||'—'}</td>
+      <td>${r.testKit||'—'}</td><td>${r.reagent||'—'}</td>
+    </tr>`).join('')}
+  </table>
+  ${WSR.coolProds&&WSR.coolProds.length?`<div style="margin:4px 0 6px"><span style="font-size:8px;color:#6B7280;font-weight:700">Products: </span>${WSR.coolProds.map(p=>`<span class="chip chip-blue">${p}</span>`).join('')}</div>`:''}
+  ${wsrCoolAlerts()?`<div class="alerts-box"><div style="font-size:9px;font-weight:700;color:#991B1B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">⚠ Cooling Water Alerts & Recommended Actions</div>${cRows.map(r=>{
+    const alerts=[];
+    [['nitrite','Nitrite',CL.nitrite],['ph','pH',CL.ph],['chloride','Chloride',CL.chloride],['conductivity','Conductivity',CL.conductivity]].forEach(([fld,lbl,cl])=>{
+      if(!r[fld])return;const st=wsrSt(r[fld],cl.lo,cl.hi);
+      if(st!=='ok'&&st!=='na')alerts.push(`<div class="alert-item"><b>${r.name} — ${lbl} ${st.toUpperCase()} (${r[fld]}):</b> ${wsrCoolMsg(fld,st)}</div>`);
+    });
+    if(r.oilContam==='Yes')alerts.push(`<div class="alert-item"><b>${r.name} — Oil Contamination:</b> Investigate source. Drain and flush system if necessary.</div>`);
+    return alerts.join('');}).join('')}</div>`:''}
+</div>`:''}
+
+${W.sysType&&W.sysType!=='None'?`<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">WP</div><div class="sec-title">Water Production System</div></div>
+  <div class="info-grid">
+    <div class="ig"><div class="il">System Type</div><div class="iv">${W.sysType}</div></div>
+    ${W.roMaker?`<div class="ig"><div class="il">RO Maker</div><div class="iv">${W.roMaker==='Others'?(W.roMakerOther||'Others'):W.roMaker}</div></div>`:''}
+    <div class="ig"><div class="il">Capacity</div><div class="iv">${W.capacity||'—'} ${W.sysType==='Evaporator'?'ton/day':'m³/day'}</div></div>
+    <div class="ig"><div class="il">Consumption</div><div class="iv">${W.consumption||'—'} L/day</div></div>
+    <div class="ig"><div class="il">Dosing Method</div><div class="iv">${W.method||'—'}</div></div>
+  </div>
+  ${W.prods&&W.prods.length?`<div style="margin-bottom:6px"><span style="font-size:8px;color:#6B7280;font-weight:700">Chemicals: </span>${W.prods.map(p=>`<span class="chip chip-blue">${p}</span>`).join('')}</div>`:''}
+  ${W.comments?`<div style="font-size:9px;color:#374151;line-height:1.5">${W.comments}</div>`:''}
+</div>`:''}
+
+<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">PW</div><div class="sec-title">Potable Water System</div></div>
+  ${P.prods&&P.prods.length?`<div style="margin-bottom:6px"><span style="font-size:8px;color:#6B7280;font-weight:700">Chemicals: </span>${P.prods.map(p=>`<span class="chip chip-blue">${p}</span>`).join('')}${P.freeText?`<span class="chip chip-blue">${P.freeText}</span>`:''}</div>`:''}
+  <div class="info-grid">
+    <div class="ig"><div class="il">Dosing Method</div><div class="iv">${P.dosingMethod||'—'}</div></div>
+    <div class="ig"><div class="il">Corrosion Shield</div><div class="iv">${P.corrosionShield?'Installed':'Not installed'}</div></div>
+    ${P.corrosionShield&&P.lastCartridge?`<div class="ig"><div class="il">Last Cartridge Change</div><div class="iv">${P.lastCartridge}</div></div>`:''}
+    <div class="ig"><div class="il">Discoloration</div><div class="iv" style="${P.discoloration?'color:#DC2626;font-weight:700':''}">${P.discoloration?'⚠ Yes — see photo':'Not observed'}</div></div>
+  </div>
+  ${P.discoloration&&P.discolorPhoto?`<div style="margin:8px 0 6px">
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#991B1B;margin-bottom:6px">⚠ Discolored Water Sample</div>
+    <img src="${P.discolorPhoto}" style="max-width:280px;border-radius:8px;border:2px solid #FECACA;display:block;max-height:180px;object-fit:contain">
+  </div>`:''}
+  ${P.discoloration&&!P.discolorPhoto?`<div style="font-size:10px;color:#DC2626;margin:4px 0;padding:5px 10px;background:#FEF2F2;border-radius:6px;border-left:3px solid #EF4444">⚠ Discoloration observed — no photo attached</div>`:''}
+  ${P.comments?`<div style="font-size:10px;color:#374151;margin-top:4px">${P.comments}</div>`:''}
+</div>
+
+${S.prods&&S.prods.length||S.swOther?`<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">SW</div><div class="sec-title">Seawater System</div></div>
+  ${S.prods&&S.prods.length?`<div style="margin-bottom:6px"><span style="font-size:8px;color:#6B7280;font-weight:700">Chemicals: </span>${S.prods.map(p=>`<span class="chip chip-blue">${p}</span>`).join('')}${S.swOther?`<span class="chip chip-blue">${S.swOther}</span>`:''}</div>`:''}
+  <div class="info-grid"><div class="ig"><div class="il">Dosing Method</div><div class="iv">${S.dosingMethod||'—'}</div></div></div>
+  ${S.comments?`<div style="font-size:9px;color:#374151">${S.comments}</div>`:''}
+</div>`:''}
+
+<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">WPR</div><div class="sec-title">Waterproof Software</div></div>
+  <div class="info-grid">
+    <div class="ig"><div class="il">In Use</div><div class="iv">${WP.inUse||'Not specified'}</div></div>
+    ${WP.inUse==='Yes'&&WP.version?`<div class="ig"><div class="il">Version</div><div class="iv">${WP.version}</div></div>`:''}
+    ${WP.comments?`<div class="ig"><div class="il">Notes</div><div class="iv">${WP.comments}</div></div>`:''}
+  </div>
+</div>
+
+${B.maker||B.sysType?`<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">BWT</div><div class="sec-title">Ballast Water Treatment System</div></div>
+  <div class="info-grid">
+    ${B.maker?`<div class="ig"><div class="il">Maker</div><div class="iv">${B.maker}</div></div>`:''}
+    ${B.sysType?`<div class="ig"><div class="il">System Type</div><div class="iv">${B.sysType}</div></div>`:''}
+    ${B.chemType?`<div class="ig"><div class="il">Chemical Type</div><div class="iv">${B.chemType}</div></div>`:''}
+    <div class="ig"><div class="il">Dosing Unit</div><div class="iv">${B.dosingUnit?'Yes':'No'}</div></div>
+  </div>
+  ${B.chemicals&&B.chemicals.length?`<div style="margin-bottom:6px"><span style="font-size:8px;color:#6B7280;font-weight:700">Chemicals: </span>${B.chemicals.map(p=>`<span class="chip chip-blue">${p}</span>`).join('')}${B.ballastOther?`<span class="chip chip-blue">${B.ballastOther}</span>`:''}</div>`:''}
+  ${B.comments?`<div style="font-size:9px;color:#374151">${B.comments}</div>`:''}
+</div>`:''}
+
+${WSR.photos&&WSR.photos.length?`<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">📷</div><div class="sec-title">Equipment Photos & Inspection Notes</div></div>
+  <div class="photo-grid">
+    ${WSR.photos.map(ph=>{
+      const sc={'OK':'#166534','Damaged':'#991B1B','Needs Replacement':'#92400E','Needs Attention':'#78350F','Not Inspected':'#374151'}[ph.status||'Not Inspected'];
+      const sb={'OK':'#F0FDF4','Damaged':'#FEF2F2','Needs Replacement':'#FFFBEB','Needs Attention':'#FFFBEB','Not Inspected':'#F9FAFB'}[ph.status||'Not Inspected'];
+      return `<div class="pc"><img src="${ph.data}" alt="${ph.label}">
+        <div class="pi"><div class="pl">${ph.label}</div>
+        <div class="ps" style="background:${sb};color:${sc}">${ph.status||'Not Inspected'}</div>
+        ${ph.comment?`<div class="pc-note">${ph.comment}</div>`:''}
+        </div></div>`;}).join('')}
+  </div>
+</div>`:''}
+
+<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">ROB</div><div class="sec-title">ROB — Remaining on Board</div></div>
+  ${WSR.rob.mode==='photo'&&WSR.rob.robPhoto?`
+    <div style="margin-bottom:10px;font-size:10px;color:#6B7280;font-style:italic">ROB recorded as photograph of vessel's ROB document</div>
+    <img src="${WSR.rob.robPhoto}" style="max-width:100%;border-radius:8px;border:1.5px solid #BFDBFE;display:block;max-height:400px;object-fit:contain">
+  `:`${robItems.length?`
+  <table>
+    <tr><th>Product</th><th style="text-align:right">ROB (L / kg)</th></tr>
+    ${allProds.map((p,i)=>{const q=(WSR.rob.items[i]&&WSR.rob.items[i].qty)||'';return q?`<tr class="rob-row"><td style="font-size:11px">${p}</td><td style="text-align:right;font-weight:700;color:#1D4ED8;font-size:12px">${q}</td></tr>`:''}).join('')}
+    ${(WSR.rob.extraItems||[]).filter(x=>x.prod&&x.qty).map(ei=>`<tr class="rob-row" style="background:#EFF6FF"><td style="font-weight:600;font-size:11px">${ei.prod}</td><td style="text-align:right;font-weight:700;color:#1D4ED8;font-size:12px">${ei.qty}</td></tr>`).join('')}
+  </table>`:'<div style="font-size:10px;color:#9CA3AF;padding:8px 0">No ROB data entered</div>'}`}
+</div>
+
+${WSR.comments.general?`<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">N</div><div class="sec-title">Notes & Recommendations</div></div>
+  <div style="font-size:9.5px;color:#374151;line-height:1.7;white-space:pre-wrap">${WSR.comments.general}</div>
+</div>`:''}
+
+<div class="disclaimer">
+  The test results and recommendations provided by WSS are based solely on the sample(s) provided by the Customer. WSS accepts no responsibility for the accuracy of results if sampling, handling, or transport was not performed correctly. All samples are analyzed as received, and results apply only to those specific samples under the tested conditions. WSS shall not be liable for any loss, damage, or third-party claims arising from the use of these results or recommendations.
+</div>
+<div class="footer">
+  <div><div class="fb">Wilhelmsen Ships Service</div><div class="fs">wilhelmsen.com · wss.watertechnology@wilhelmsen.com</div></div>
+  <div class="fr">WSS PSE Report · ${WSR.vessel} · IMO ${WSR.imo}<br>Generated ${new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</div>
+</div>
 </body></html>`;
+
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const w=window.open(url,'_blank');
+  if(w)w.onload=()=>setTimeout(()=>w.print(),600);
 }
 
+function wsrEmailReport(){
+  wsrExportPDF();
+  const subj=encodeURIComponent(`PSE Water Service Report — ${WSR.vessel} (IMO ${WSR.imo}) — ${WSR.date}`);
+  const body=encodeURIComponent(`Dear,\n\nPlease find attached the WSS PSE Water Service Report for:\n\nVessel: ${WSR.vessel}\nIMO: ${WSR.imo}\nDate: ${WSR.date}\nPort: ${WSR.port||'—'}\nCustomer: ${WSR.customer||'—'}\n\nThe PDF has been downloaded — please attach it.\n\nBest regards,\n${WSR.pse||'WSS PSE'}`);
+  setTimeout(()=>{window.location.href=`mailto:?subject=${subj}&body=${body}`;},800);
+}
 
-// ── NBI NAMED TOGGLE & OPTION HANDLERS ───────────────────────────────────────
-// Toggles
-function nbiT_hasPool()    { NBI.hasPool      = !NBI.hasPool;      nbiRefresh(); }
-function nbiT_hfo()        { NBI.hfo          = !NBI.hfo;          nbiRefresh(); }
-function nbiT_dist()       { NBI.distillate   = !NBI.distillate;   nbiRefresh(); }
-function nbiT_hasCargo()   { NBI.hasCargo     = !NBI.hasCargo;     nbiRefresh(); }
-function nbiT_weldCons()   { NBI.weldConsumables = !NBI.weldConsumables; nbiRefresh(); }
-function nbiT_gases()      { NBI.gases        = !NBI.gases;        nbiRefresh(); }
-function nbiT_lubAz()      { NBI.lub_az       = !NBI.lub_az;       nbiRefresh(); }
-function nbiT_lubSt()      { NBI.lub_st       = !NBI.lub_st;       nbiRefresh(); }
-function nbiT_lubWr()      { NBI.lub_wr       = !NBI.lub_wr;       nbiRefresh(); }
-function nbiT_lubOg()      { NBI.lub_og       = !NBI.lub_og;       nbiRefresh(); }
-function nbiT_lubComp()    { NBI.lub_comp     = !NBI.lub_comp;     nbiRefresh(); }
-function nbiT_hasRefrig()  { NBI.hasRefrig    = !NBI.hasRefrig;    nbiRefresh(); }
-function nbiT_refrigEquip(){ NBI.refrigEquip  = !NBI.refrigEquip;  nbiRefresh(); }
-// Cleaning section toggles
-function nbiT_clEr()   { if(!NBI.selections.cleaning) NBI.selections.cleaning={}; NBI.selections.cleaning.er   = !NBI.selections.cleaning.er;   nbiRefresh(); }
-function nbiT_clDeck() { if(!NBI.selections.cleaning) NBI.selections.cleaning={}; NBI.selections.cleaning.deck = !NBI.selections.cleaning.deck; nbiRefresh(); }
-function nbiT_clTank() { if(!NBI.selections.cleaning) NBI.selections.cleaning={}; NBI.selections.cleaning.tank = !NBI.selections.cleaning.tank; nbiRefresh(); }
-function nbiT_clDesc() { if(!NBI.selections.cleaning) NBI.selections.cleaning={}; NBI.selections.cleaning.desc = !NBI.selections.cleaning.desc; nbiRefresh(); }
-function nbiT_clBio()  { if(!NBI.selections.cleaning) NBI.selections.cleaning={}; NBI.selections.cleaning.bio  = !NBI.selections.cleaning.bio;  nbiRefresh(); }
-// Option selectors
-function nbiO_type(v)  { NBI.type           = v; nbiRefresh(); }
-function nbiO_dwt(v)   { NBI.dwt            = v; nbiRefresh(); }
-function nbiO_bp(v)    { NBI.boilerPressure = v; nbiRefresh(); }
-function nbiO_bf(v)    { NBI.boilerFeedwater= v; nbiRefresh(); }
-function nbiO_bc(v)    { NBI.boilerCount    = v; nbiRefresh(); }
-function nbiO_ca(v)    { NBI.coolingAl      = v; nbiRefresh(); }
-function nbiO_ct(v)    { NBI.cargoType      = v; nbiRefresh(); }
-function nbiO_rv(v)    { NBI.ropeVessel     = v; nbiRefresh(); }
-function nbiO_rd(v)    { NBI.ropeDwt        = v; nbiRefresh(); }
-function nbiO_ws(v)    { NBI.weldingSize    = v; nbiRefresh(); }
-function nbiO_rt(v)    { NBI.refrigType     = v; nbiRefresh(); }
+// ── WSR Photo Popup ───────────────────────────────────────────────────────────
+let _wsrPopupIdx=-1;
+function wsrPhotoPopup(i){
+  const ph=(WSR.photos&&WSR.photos[i]);if(!ph)return;
+  _wsrPopupIdx=i;
+  document.getElementById('wsr-popup-img').src=ph.data;
+  document.getElementById('wsr-popup-title').textContent=ph.label;
+  document.getElementById('wsr-popup-comment').value=ph.comment||'';
+  document.getElementById('wsr-popup-label').value=ph.label||'';
+  const statuses=['OK','Damaged','Needs Replacement','Needs Attention','Not Inspected'];
+  const colors={'OK':'#166534','Damaged':'#991B1B','Needs Replacement':'#92400E','Needs Attention':'#78350F','Not Inspected':'#374151'};
+  const bgs={'OK':'#F0FDF4','Damaged':'#FEF2F2','Needs Replacement':'#FFFBEB','Needs Attention':'#FFFBEB','Not Inspected':'#F9FAFB'};
+  document.getElementById('wsr-popup-status-btns').innerHTML=statuses.map(s=>{
+    const active=(ph.status||'Not Inspected')===s;
+    return `<button onclick="wsrSetPopupStatus('${s}')" style="padding:8px 6px;border-radius:9px;border:1.5px solid ${active?colors[s]:'var(--border2)'};background:${active?bgs[s]:'var(--card)'};font-size:11px;font-weight:${active?'700':'500'};color:${active?colors[s]:'var(--text3)'};cursor:pointer">${s}</button>`;
+  }).join('');
+  document.getElementById('wsr-photo-popup').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function wsrSetPopupStatus(s){
+  if(_wsrPopupIdx<0||!WSR.photos)return;
+  WSR.photos[_wsrPopupIdx].status=s;
+  const ph=WSR.photos[_wsrPopupIdx];
+  const statuses=['OK','Damaged','Needs Replacement','Needs Attention','Not Inspected'];
+  const colors={'OK':'#166534','Damaged':'#991B1B','Needs Replacement':'#92400E','Needs Attention':'#78350F','Not Inspected':'#374151'};
+  const bgs={'OK':'#F0FDF4','Damaged':'#FEF2F2','Needs Replacement':'#FFFBEB','Needs Attention':'#FFFBEB','Not Inspected':'#F9FAFB'};
+  const c=document.getElementById('wsr-popup-status-btns');
+  if(c)c.innerHTML=statuses.map(st=>{const a=ph.status===st;return`<button onclick="wsrSetPopupStatus('${st}')" style="padding:8px 6px;border-radius:9px;border:1.5px solid ${a?colors[st]:'var(--border2)'};background:${a?bgs[st]:'var(--card)'};font-size:11px;font-weight:${a?'700':'500'};color:${a?colors[st]:'var(--text3)'};cursor:pointer">${st}</button>`;}).join('');
+}
+function wsrSavePopup(){
+  if(_wsrPopupIdx<0||!WSR.photos)return;
+  const ph=WSR.photos[_wsrPopupIdx];
+  ph.comment=document.getElementById('wsr-popup-comment').value;
+  ph.label=document.getElementById('wsr-popup-label').value||ph.label;
+  if(!ph.status)ph.status='Not Inspected';
+  wsrClosePopup();wsrRefresh();
+}
+function wsrClosePopup(){
+  const p=document.getElementById('wsr-photo-popup');
+  if(p)p.style.display='none';
+  document.body.style.overflow='';
+  _wsrPopupIdx=-1;
+}
 
 
 // ── INIT ───────────────────────────────────────────────────────────────────────
@@ -4961,5 +5872,33 @@ setTimeout(()=>{const el=pw.querySelector('.pg');if(el){el.classList.remove('rig
 
 
 </script>
+
+<!-- WSR Photo Inspection Popup -->
+<div id="wsr-photo-popup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:9999;-webkit-overflow-scrolling:touch" onclick="wsrClosePopup()">
+  <div id="wsr-popup-inner" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg);border-radius:20px 20px 0 0;padding:0 0 24px;max-height:92vh;overflow-y:auto" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px;font-weight:700;color:var(--text)" id="wsr-popup-title">Photo Inspection</div>
+      <button onclick="wsrClosePopup()" style="background:var(--bg3);border:none;border-radius:50%;width:28px;height:28px;display:grid;place-items:center;cursor:pointer">
+        <i class="ti ti-x" style="font-size:13px;color:var(--text2)"></i>
+      </button>
+    </div>
+    <div style="padding:12px 16px">
+      <img id="wsr-popup-img" src="" alt="" style="width:100%;border-radius:10px;margin-bottom:12px;max-height:220px;object-fit:contain;background:var(--bg3)">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px">Inspection Status</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px" id="wsr-popup-status-btns"></div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:5px">Comment / Observation</div>
+      <textarea id="wsr-popup-comment" placeholder="e.g. Minor corrosion on fitting — recommend replacement at next service..." rows="3"
+        style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;resize:none;margin-bottom:10px"></textarea>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:5px">Rename Label</div>
+      <input id="wsr-popup-label" type="text" placeholder="Photo label..."
+        style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;margin-bottom:12px">
+      <button onclick="wsrSavePopup()" style="width:100%;padding:12px;background:#0B6E4F;border:none;border-radius:11px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">
+        Save Inspection Notes
+      </button>
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>
