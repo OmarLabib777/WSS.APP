@@ -5524,20 +5524,7 @@ function wsrStepROB(){
   }
   if(!WSR.rob.mode) WSR.rob.mode='manual';
   return `
-  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">ROB — Remaining on Board</div>
-  <div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5">Choose how to record the remaining stock on board.</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-    <div onclick="WSR.rob.mode='manual';wsrRefresh()" style="background:var(--card);border:2px solid ${WSR.rob.mode==='manual'?'#1D6FA4':'var(--border2)'};border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center">
-      <i class="ti ti-list-check" style="font-size:24px;color:${WSR.rob.mode==='manual'?'#1D6FA4':'var(--text3)'}"></i>
-      <div style="font-size:12px;font-weight:700;color:${WSR.rob.mode==='manual'?'#1D6FA4':'var(--text2)'};margin-top:6px">Enter Manually</div>
-      <div style="font-size:10px;color:var(--text3);margin-top:2px">Type qty per product</div>
-    </div>
-    <div onclick="WSR.rob.mode='photo';wsrRefresh()" style="background:var(--card);border:2px solid ${WSR.rob.mode==='photo'?'#1D6FA4':'var(--border2)'};border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center">
-      <i class="ti ti-camera" style="font-size:24px;color:${WSR.rob.mode==='photo'?'#1D6FA4':'var(--text3)'}"></i>
-      <div style="font-size:12px;font-weight:700;color:${WSR.rob.mode==='photo'?'#1D6FA4':'var(--text2)'};margin-top:6px">Photo of ROB List</div>
-      <div style="font-size:10px;color:var(--text3);margin-top:2px">Scan & auto-fill</div>
-    </div>
-  </div>
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">ROB — Remaining on Board</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
     <div onclick="WSR.rob.mode='manual';wsrRefresh()" style="padding:14px 12px;border-radius:12px;border:2px solid ${WSR.rob.mode==='manual'?'#1D6FA4':'var(--border2)'};background:${WSR.rob.mode==='manual'?'#EFF6FF':'var(--card)'};cursor:pointer;text-align:center">
       <i class="ti ti-list-check" style="font-size:24px;color:${WSR.rob.mode==='manual'?'#1D6FA4':'var(--text3)'}"></i>
@@ -5547,7 +5534,7 @@ function wsrStepROB(){
     <div onclick="WSR.rob.mode='photo';wsrRefresh()" style="padding:14px 12px;border-radius:12px;border:2px solid ${WSR.rob.mode==='photo'?'#1D6FA4':'var(--border2)'};background:${WSR.rob.mode==='photo'?'#EFF6FF':'var(--card)'};cursor:pointer;text-align:center">
       <i class="ti ti-camera" style="font-size:24px;color:${WSR.rob.mode==='photo'?'#1D6FA4':'var(--text3)'}"></i>
       <div style="font-size:12px;font-weight:700;color:${WSR.rob.mode==='photo'?'#1D6FA4':'var(--text2)'};margin-top:6px">Photo of ROB List</div>
-      <div style="font-size:10px;color:var(--text3);margin-top:3px;line-height:1.4">Take a photo of the ROB paper</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px;line-height:1.4">Scan &amp; auto-fill</div>
     </div>
   </div>
   ${WSR.rob.mode==='photo'?`
