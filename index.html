@@ -5020,7 +5020,7 @@ function wsrStepVessel(){return `
           style="width:100%;padding:9px 10px;border:1.5px solid var(--border2);border-radius:9px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box">
       </div>
     </div>
-    <div id="wsr-imo-hint" style="font-size:11px;min-height:16px;margin-bottom:6px"></div>
+    <div id="wsr-imo-hint" style="font-size:11px;min-height:16px;margin-bottom:6px"><span style="color:#1D6FA4"><i class="ti ti-hand-click" style="vertical-align:-2px;margin-right:3px"></i>Enter IMO number then tap the lookup button to auto-load vessel systems</span></div>
     <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">Customer / Owner</div>
     <input id="wsr-customer" value="${WSR.customer||''}" placeholder="e.g. CADELER A/S" onblur="WSR.customer=this.value"
       style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box;margin-bottom:10px">
@@ -5041,6 +5041,26 @@ function wsrStepVessel(){return `
     ${['Offshore Support','Bulk Carrier','Tanker','Container','General Cargo','Passenger Vessel','Other'].map(t=>`<button onclick="WSR.type='${t}';wsrRefresh()" style="padding:9px;border-radius:9px;border:1.5px solid ${WSR.type===t?WSR_ACC:'var(--border2)'};background:${WSR.type===t?'#EFF6FF':'var(--card)'};font-size:11px;font-weight:600;color:${WSR.type===t?WSR_ACC:'var(--text2)'};cursor:pointer">${t}</button>`).join('')}
   </div>
   ${wsrNxtBtn('Continue to Boiler Water','wsrVesselNext()',!WSR.vessel||!WSR.imo)}`;}
+
+function wsrCheckIMO(){
+  const el = document.getElementById('wsr-imo');
+  if(el) WSR.imo = el.value.trim();
+  const hint = document.getElementById('wsr-imo-hint');
+  if(!hint) return;
+  const vdb = wsrLookupVessel(WSR.imo);
+  if(vdb){
+    hint.innerHTML = '<span style="color:#1D6FA4;font-weight:700"><i class="ti ti-check" style="vertical-align:-2px"></i> Vessel found: <b>' + vdb.name + '</b> — ' + (vdb.boilerSystems?vdb.boilerSystems.length:0) + ' boiler + ' + (vdb.coolSystems?vdb.coolSystems.length:0) + ' cooling systems pre-loaded</span>';
+    const vn = document.getElementById('wsr-vessel');
+    const cu = document.getElementById('wsr-customer');
+    if(vn && !vn.value) { vn.value = vdb.name; WSR.vessel = vdb.name; }
+    if(cu && !cu.value && vdb.customer) { cu.value = vdb.customer; WSR.customer = vdb.customer; }
+    if(!WSR.type && vdb.type) { WSR.type = vdb.type; wsrRefresh(); }
+  } else if(WSR.imo && WSR.imo.length >= 7){
+    hint.innerHTML = '<span style="color:#6B7280">No pre-loaded configuration for this IMO — fill in the systems manually</span>';
+  } else {
+    hint.innerHTML = '';
+  }
+}
 
 function wsrVesselNext(){
   ['vessel','imo','customer','port','date','chiefEngineer','pse'].forEach(k=>{const el=document.getElementById('wsr-'+k);if(el)WSR[k]=el.value;});
@@ -5601,7 +5621,12 @@ function wsrROBScan(){
   const mime=(WSR.rob.robPhoto.match(/data:([^;]+);/)||[,'image/jpeg'])[1];
   const selectedProds=wsrCollectAllProds();
   fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',headers:{'Content-Type':'application/json'},
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
     body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:[
       {type:'image',source:{type:'base64',media_type:mime,data:b64}},
       {type:'text',text:'This is a ship ROB (remaining on board) chemical inventory list. Extract ALL product names and quantities. Return ONLY a JSON array, no markdown: [{"product":"name","qty":"25L"}]. Known products: '+selectedProds.join(', ')+'. Include all visible products even if not in known list.'}
@@ -5620,7 +5645,11 @@ function wsrROBScan(){
     WSR.rob.scanning=false; WSR.rob.scanDone=true;
     WSR.rob.scanMsg='Found '+parsed.length+' products: '+filled+' matched to report, '+newCount+' new added below';
     wsrRefresh();
-  }).catch(err=>{WSR.rob.scanning=false;WSR.rob.scanError='Scan failed: '+(err.message||'Check connection');wsrRefresh();});
+  }).catch(err=>{
+    WSR.rob.scanning=false;
+    WSR.rob.scanError='Scan failed: '+(err.message||'Check connection and try again');
+    wsrRefresh();
+  });
 }
 
 function wsrCollectAllProds(){
