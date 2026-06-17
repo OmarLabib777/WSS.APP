@@ -4809,6 +4809,43 @@ Kind regards`
 
 
 
+
+// ══════════════════════════════════════════════════════════════════════════════
+// VESSEL DATABASE — pre-loaded system configurations
+// ══════════════════════════════════════════════════════════════════════════════
+const WSR_VESSEL_DB = {
+  '9584712': {
+    name:     'Royal Princess',
+    type:     'Passenger Vessel',
+    customer: 'Princess Cruises',
+    boilerLimits: {ph:{lo:9.5,hi:11.5}, pAlk:{lo:150,hi:300}, chloride:{lo:0,hi:200}, deha:{lo:0.1,hi:0.5}, conductivity:{lo:0,hi:2250}},
+    boilerProds: ['Autotreat','Oxygen Scavenger Plus'],
+    boilerSystems: [
+      {name:'FWD Boiler', capacity:'', makeup:'', dosing:'Manual', blowdown:'', appearance:''},
+      {name:'AFT Boiler', capacity:'', makeup:'', dosing:'Manual', blowdown:'', appearance:''},
+    ],
+    coolingLimits: {nitrite:{lo:1000,hi:3000}, ph:{lo:8,hi:11}, chloride:{lo:0,hi:50}, conductivity:{lo:3000,hi:5000}},
+    coolProds: ['Rocor NB Liquid'],
+    coolSystems: [
+      {name:'HT FWD',    capacity:'', nitrite:'', ph:'', chloride:'', conductivity:'', pAlk:'', makeup:'', dosing:'Manual', appearance:'', oilContam:'', testKit:'', reagent:''},
+      {name:'HT AFT',    capacity:'', nitrite:'', ph:'', chloride:'', conductivity:'', pAlk:'', makeup:'', dosing:'Manual', appearance:'', oilContam:'', testKit:'', reagent:''},
+      {name:'LT FWD',    capacity:'', nitrite:'', ph:'', chloride:'', conductivity:'', pAlk:'', makeup:'', dosing:'Manual', appearance:'', oilContam:'', testKit:'', reagent:''},
+      {name:'LT AFT',    capacity:'', nitrite:'', ph:'', chloride:'', conductivity:'', pAlk:'', makeup:'', dosing:'Manual', appearance:'', oilContam:'', testKit:'', reagent:''},
+      {name:'LT AUX FWD',capacity:'', nitrite:'', ph:'', chloride:'', conductivity:'', pAlk:'', makeup:'', dosing:'Manual', appearance:'', oilContam:'', testKit:'', reagent:''},
+      {name:'LT AUX AFT',capacity:'', nitrite:'', ph:'', chloride:'', conductivity:'', pAlk:'', makeup:'', dosing:'Manual', appearance:'', oilContam:'', testKit:'', reagent:''},
+      {name:'REHEAT',    capacity:'', nitrite:'', ph:'', chloride:'', conductivity:'', pAlk:'', makeup:'', dosing:'Manual', appearance:'', oilContam:'', testKit:'', reagent:''},
+      {name:'CHILLED',   capacity:'', nitrite:'', ph:'', chloride:'', conductivity:'', pAlk:'', makeup:'', dosing:'Manual', appearance:'', oilContam:'', testKit:'', reagent:''},
+    ],
+  },
+  // Add more vessels here as:
+  // 'IMO_NUMBER': { name, type, customer, boilerLimits, boilerSystems, coolingLimits, coolSystems, ... }
+};
+
+function wsrLookupVessel(imo) {
+  const trimmed = imo.trim().replace(/^IMO\s*/i,'');
+  return WSR_VESSEL_DB[trimmed] || null;
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // PSE WATER SERVICE REPORT (WSR) — v3
 // ══════════════════════════════════════════════════════════════════════════════
@@ -4949,7 +4986,16 @@ function wsrStepVessel(){return `
   ${wsrCard(`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div style="grid-column:span 2"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Vessel Name</div><input id="wsr-vessel" value="${WSR.vessel||''}" placeholder="e.g. WIND PACE" onblur="WSR.vessel=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
-      <div><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">IMO Number</div><input id="wsr-imo" value="${WSR.imo||''}" placeholder="9957830" onblur="WSR.imo=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">IMO Number</div>
+        <div style="display:flex;gap:6px">
+          <input id="wsr-imo" value="${WSR.imo||''}" placeholder="9957830" onblur="WSR.imo=this.value;wsrCheckIMO()"
+            style="flex:1;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text)">
+          <button onclick="wsrCheckIMO()" style="padding:9px 12px;background:var(--wblue);border:none;border-radius:9px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">
+            <i class="ti ti-database-search" style="font-size:13px;vertical-align:-2px"></i> Lookup
+          </button>
+        </div>
+        <div id="wsr-imo-hint" style="margin-top:5px;font-size:11px;min-height:18px"></div>
+      </div>
       <div><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Date</div><input id="wsr-date" type="date" value="${WSR.date||''}" onblur="WSR.date=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
       <div style="grid-column:span 2"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Customer / Owner</div><input id="wsr-customer" value="${WSR.customer||''}" placeholder="e.g. CADELER A/S" onblur="WSR.customer=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
       <div style="grid-column:span 2"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Port / Place of Service</div><input id="wsr-port" value="${WSR.port||''}" placeholder="e.g. Esbjerg" onblur="WSR.port=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
@@ -4963,9 +5009,50 @@ function wsrStepVessel(){return `
   </div>
   ${wsrNxtBtn('Continue to Boiler Water','wsrVesselNext()',!WSR.vessel||!WSR.imo)}`;}
 
+function wsrCheckIMO(){
+  const el = document.getElementById('wsr-imo');
+  if(el) WSR.imo = el.value.trim();
+  const hint = document.getElementById('wsr-imo-hint');
+  if(!hint) return;
+  const vdb = wsrLookupVessel(WSR.imo);
+  if(vdb){
+    hint.innerHTML = '<span style="color:#1D6FA4;font-weight:700"><i class="ti ti-check" style="vertical-align:-2px"></i> Vessel found: <b>' + vdb.name + '</b> — ' + (vdb.boilerSystems?vdb.boilerSystems.length:0) + ' boiler + ' + (vdb.coolSystems?vdb.coolSystems.length:0) + ' cooling systems pre-loaded</span>';
+    // Also pre-fill vessel name and customer if empty
+    const vn = document.getElementById('wsr-vessel');
+    const cu = document.getElementById('wsr-customer');
+    if(vn && !vn.value) { vn.value = vdb.name; WSR.vessel = vdb.name; }
+    if(cu && !cu.value && vdb.customer) { cu.value = vdb.customer; WSR.customer = vdb.customer; }
+    if(!WSR.type && vdb.type) WSR.type = vdb.type;
+    wsrRefresh();
+  } else if(WSR.imo.length >= 7){
+    hint.innerHTML = '<span style="color:#6B7280">No pre-loaded configuration for this IMO — you can fill in the systems manually</span>';
+  } else {
+    hint.innerHTML = '';
+  }
+}
+
 function wsrVesselNext(){
   ['vessel','imo','customer','port','date','chiefEngineer','pse'].forEach(k=>{const el=document.getElementById('wsr-'+k);if(el)WSR[k]=el.value;});
   if(!WSR.vessel||!WSR.imo)return;
+  // Auto-populate from vessel database
+  const vdb = wsrLookupVessel(WSR.imo);
+  if(vdb){
+    if(!WSR.vessel||WSR.vessel===WSR.imo) WSR.vessel = vdb.name;
+    if(!WSR.type) WSR.type = vdb.type||WSR.type;
+    if(!WSR.customer) WSR.customer = vdb.customer||WSR.customer;
+    // Load boiler systems if not yet filled
+    if(vdb.boilerSystems && WSR.boiler.length<=1 && !WSR.boiler[0]?.name){
+      WSR.boiler = vdb.boilerSystems.map(s=>({...s}));
+    }
+    if(vdb.boilerLimits) WSR.boilerLimits = {...vdb.boilerLimits};
+    if(vdb.boilerProds && !WSR.boilerProds.length) WSR.boilerProds = [...vdb.boilerProds];
+    // Load cooling systems if not yet filled
+    if(vdb.coolSystems && WSR.cooling.length<=1 && !WSR.cooling[0]?.name){
+      WSR.cooling = vdb.coolSystems.map(s=>({...s}));
+    }
+    if(vdb.coolingLimits) WSR.coolingLimits = {...vdb.coolingLimits};
+    if(vdb.coolProds && !WSR.coolProds.length) WSR.coolProds = [...vdb.coolProds];
+  }
   wsrNext();
 }
 
