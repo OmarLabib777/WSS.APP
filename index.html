@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+${rc>0?`<span style="position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:9px;background:#DC2626;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;padding:0 4px">${rc}</span>`:''}<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -229,18 +229,9 @@ input,button,select{font-family:Inter,sans-serif;-webkit-appearance:none}
   </div>
   <div class="seg">
     <button class="sb on" id="sn-home" onclick="goHome()"><i class="ti ti-home" aria-hidden="true"></i>Home</button>
-    <button class="sb" id="sn-wt" onclick="goSeg('wt')"><i class="ti ti-droplet" aria-hidden="true"></i>Water</button>
-    <button class="sb" id="sn-cl" onclick="goSeg('cl')"><i class="ti ti-spray" aria-hidden="true"></i>Cleaning</button>
-    <button class="sb" id="sn-fl" onclick="goSeg('fl')"><i class="ti ti-droplet-filled" aria-hidden="true"></i>Fuel</button>
-    <button class="sb" id="sn-nv" onclick="goSeg('nv')"><i class="ti ti-building-warehouse" aria-hidden="true"></i>Hold</button>
-    <button class="sb" id="sn-kl" onclick="goSeg('kl')"><i class="ti ti-droplet-filled" aria-hidden="true"></i>Klüber</button>
-    <button class="sb" id="sn-rp" onclick="goSeg('rp')"><i class="ti ti-git-branch" aria-hidden="true"></i>Ropes</button>
-    <button class="sb" id="sn-wld" onclick="goSeg('wld')"><i class="ti ti-flame" aria-hidden="true"></i>Welding</button>
-    <button class="sb" id="sn-gas" onclick="goSeg('gas')"><i class="ti ti-cylinder" aria-hidden="true"></i>Gases</button>
-    <button class="sb" id="sn-ref" onclick="goSeg('ref')"><i class="ti ti-temperature" aria-hidden="true"></i>Refrigerants</button>
-    <button class="sb" id="sn-nbi" onclick="goSeg('nbi')"><i class="ti ti-ship" aria-hidden="true"></i>NBI</button>
-    <button class="sb" id="sn-wsr" onclick="goSeg('wsr')"><i class="ti ti-clipboard-text" aria-hidden="true"></i>Report</button>
-    <button class="sb" id="sn-ai" onclick="goSeg('ai')"><i class="ti ti-message-chatbot" aria-hidden="true"></i>Chatbot</button>
+    <button class="sb" id="sn-products" onclick="goSeg('products')"><i class="ti ti-package" aria-hidden="true"></i>Products</button>
+    <button class="sb" id="sn-wsr" onclick="goSeg('wsr')"><i class="ti ti-clipboard-text" aria-hidden="true"></i>Water Service</button>
+    <button class="sb" id="sn-myreports" onclick="goSeg('myreports')"><i class="ti ti-files" aria-hidden="true"></i>My Reports</button>
     <button class="sb" id="sn-sr" onclick="goSeg('sr')"><i class="ti ti-search" aria-hidden="true"></i>Search</button>
   </div>
 </div>
@@ -1147,7 +1138,7 @@ const DB = {
   desc:'Fuel additive for reducing ash deposits and improving combustion efficiency in heavy fuel oil systems. Reduces clinker formation on combustion chamber surfaces and protects against vanadium and sodium sulphate high-temperature corrosion.',
   feats:['Reduces ash and clinker deposits in combustion chamber','Protects against vanadium and sodium sulphate corrosion','Improves combustion efficiency','For HSFO and residual fuel oil applications','Reduces maintenance frequency for combustion chamber components'],
   specs:[['Part number','779090'],['Size','25 LTR'],['Application','Heavy fuel oil systems'],['Dosing unit','Fuel Dosing Station #767924'],['Compatible fuels','HSFO, residual fuel oils']],
-  dosage:'Dose via Fuel Dosing Station (#767924) into fuel system. Contact WSS for specific dosage recommendations based on fuel analysis.',
+  dosage:'Dose directly into service tank or via automatic metering into suction side of booster pumps. Typical dose rate 1:2,000 to 1:6,000 depending on severity. Example: 50 ppm Na + 150 ppm V = dose 1L per 5 tonnes fuel (1:5,000). Formula: dose rate = V content (ppm) / 0.03.',
   kit:null,
   safety:'Flammable liquid. Keep away from heat and ignition sources. Wear gloves and eye protection.',
   compat:'HSFO and residual fuel oils. Use with Fuel Dosing Station (#767924).'},
@@ -1171,7 +1162,7 @@ const DB = {
   desc:'Organic catalyst for exhaust gas boiler cleaning that works at 170C - far lower than traditional solutions requiring 600C. Prevents soot and fire-scale deposits in diesel engine and boiler exhaust systems with HSFO and VLSFO. Extends cleaning intervals up to 12 months.',
   feats:['Works at just 170C - vs traditional 600C requirement','Prevents soot and fire-scale in EGB and diesel exhaust systems','For HSFO and VLSFO (IMO 2020 compliant)','Extends cleaning intervals up to 12 months','Reduces cold-end corrosion risk','Minimises cleaning water release to sea'],
   specs:[['Size','25 LTR'],['Operating temperature','Works from 170C (vs 600C for powder)'],['Compatible fuels','HSFO, VLSFO'],['Application','Exhaust gas boiler and diesel engine exhaust'],['IMO 2020','Compatible with VLSFO']],
-  dosage:'Inject into exhaust system upstream of area to be treated. Use Fixed or Portable Soot Injector for application. Contact WSS for specific dosage based on boiler/engine type.',
+  dosage:'Boiler soot removal: 0.5–1.0 L per 1,000 kg steam/hr injected upstream of contaminated area. Continuous use: 0.1–0.2 L/hr. Heavy deposits: apply undiluted shock dose first, then maintain continuous treatment. Do NOT use during manoeuvring.',
   kit:null,
   safety:'Flammable liquid. Keep away from heat and ignition sources. Wear gloves and eye protection.',
   compat:'Exhaust gas boilers and diesel engine exhaust systems. HSFO and VLSFO.'},
@@ -1188,7 +1179,7 @@ const DB = {
   desc:'Solution for poor lubricity with marine distillate fuels. Very effective in improving lubricity to protect fuel pumps from excessive wear. Particularly effective in ultra-low sulphur diesel fuels and gas oils blended to meet government sulphur regulations. Does not affect water emulsification tendency.',
   feats:['Protects fuel pumps from wear caused by poor lubricity','Particularly effective in ultra-low sulphur diesel (ULSD)','For gas oils blended for government sulphur regulations','Does not affect water emulsification tendency (ASTM D-1094)','Single-purpose lubricity improver for targeted treatment'],
   specs:[['Part number','779094'],['Size','25 LTR'],['Application','Marine distillate, ULSD, gas oil'],['Compatibility','Carbon steel, SS, fluorinated polyethylene safe']],
-  dosage:'Dose per manufacturer recommendations. Contact WSS for dosage based on fuel type and lubricity requirements.',
+  dosage:'Normal dosage: 100–200 ppm (100–200 ml per m³ of fuel). For HFRR compliance ~125 ppm is typically sufficient. Add directly into transfer pump suction for best mixing, or dose into storage/blending tanks. Best application temperature: 20–40°C.',
   kit:null,
   safety:'Flammable liquid. Wear gloves and eye protection.',
   compat:'Marine distillate fuels, ULSD, gas oil. Carbon steel, stainless steel, fluorinated polyethylene compatible.'},
@@ -1248,8 +1239,27 @@ const DB = {
   specs:[['Part number','767924'],['Pump type','BT4B 1602PVT'],['Max pump pressure','16 bar'],['Power consumption','11.2 W'],['Flow rate','2.20 L/h at max back pressure'],['Injection valve','Rated for hot systems, max 200C'],['Connection','6x4 mm'],['IMO/EU classification','D-1']],
   dosage:'Install injection valve into fuel system. Set metering pump to required dose rate per treatment chemical specifications.',
   kit:null,
-  safety:'Electrical installation. Injection valve rated for hot systems - verify temperature rating. Follow lockout/tagout during maintenance.',
-  compat:'FuelPower Catalyst (#779096), FuelPower Ashfree (#779090), FuelPower Conditioner (#779082), DieselPower products.'},
+  safety:'Electrical installation required. Use qualified personnel.'},
+'773002':{brand:'UNITOR',name:'Compatibility Test Kit',size:'Kit',p:'773002',col:'#C8102E',cat:'Fuel Test Kits',
+  desc:'On-board test to assess stability and compatibility of residual fuels (HFO/VLSFO). Determines asphaltenic sludge risk before bunkering. Essential for VLSFO and bio-blend fuels.',
+  feats:['Detects asphaltenic sludge risk before bunkering','Tests fuel compatibility with existing onboard fuel','Suitable for HFO, VLSFO, Bio-blends','Results in minutes — visual indication','Sail or don\'t sail decision support'],
+  specs:[['Part number','773002'],['Application','HFO, VLSFO, Bio-blends'],['Result time','Minutes']],
+  dosage:null,kit:null,safety:'Handle fuel with gloves and eye protection.',compat:'All residual marine fuel types.'},
+'765016':{brand:'UNITOR',name:'Catalytic Fines Test Kit',size:'Kit',p:'765016',col:'#C8102E',cat:'Fuel Test Kits',
+  desc:'Detects dangerous catalytic fines in HFO/VLSFO before bunkering. Cat fines >60 ppm Al+Si cause catastrophic cylinder liner wear. Clear sail or don\'t sail indication. Compliant with ISO 8217:2012.',
+  feats:['Detects cat fines down to 20 ppm','Flags samples >60 ppm Al+Si (ISO 8217 limit)','On-board, on-site or remote use','Minimal training required','Protects liners from abrasive wear'],
+  specs:[['Part number','765016'],['Detection range','20–200+ ppm Al+Si'],['Standard','ISO 8217:2012'],['Result time','Minutes']],
+  dosage:null,kit:null,safety:'Use PPE when handling fuel samples.',compat:'HFO, VLSFO, residual fuels.'},
+'767930':{brand:'UNITOR',name:'Combined Test Kit Plus',size:'Kit',p:'767930',col:'#C8102E',cat:'Fuel Test Kits',
+  desc:'Comprehensive on-site fuel and lubricant quality evaluation. Tests water, BN, viscosity, salt and insolubles. Reduces reagent use by 40%, waste by 80%. Stores up to 100 test results. Durable metal casing.',
+  feats:['Water-in-Oil test (all fuel types)','Base Number (BN) — alkalinity reserve','Viscosity — compare fresh vs used oil','Salt test — water ingress type','Insolubles — dispersant contamination','100 result data storage'],
+  specs:[['Part number','767930'],['Parameters','Water, BN, Viscosity, Salt, Insolubles'],['Battery life','5 yrs / 10,000 tests'],['Storage','100 results']],
+  dosage:null,kit:null,safety:'Appropriate PPE for fuel/oil handling.',compat:'Diesel, HFO, lubricating oil.'},
+'657042':{brand:'UNITOR',name:'DIGI Water-in-Oil Test Kit',size:'Kit',p:'657042',col:'#C8102E',cat:'Fuel Test Kits',
+  desc:'Digital on-board water contamination test for fuel and lube oil. Digital display with step-by-step instructions. 5-year/10,000-test battery life with memory for previous results. World-renowned test method.',
+  feats:['Digital display with instructions','Detects water in fuel and lube oil','5-year/10,000-test battery','Built-in memory for test history','No special training required'],
+  specs:[['Part number','657042'],['Display','Digital'],['Battery','5 yrs/10,000 tests'],['Application','Fuel oil, lube oil']],
+  dosage:null,kit:null,safety:'Standard PPE for fuel samples.',compat:'All marine fuels and lube oils.'},
 '572065':{brand:'UNITOR',name:'Portable Soot Injector',size:'Unit',p:'572065',col:'#B45000',cat:'Fuel Equipment',
   desc:'Portable injector for applying FuelPower Soot Remover powder to boilers and diesel engine exhaust systems. Ensures accurate application directly into the combustion or exhaust zone for maximum soot removal effectiveness.',
   feats:['Portable design for flexible use across boilers and engine exhaust','Accurate application of soot remover powder','For use with FuelPower Soot Remover powder','Directly injects into combustion or exhaust zone','Alternative to Fixed Injector (#572073)'],
@@ -1768,13 +1778,13 @@ function goBack() {
   if(html) {
     rp(id, html, 'left');
   } else {
-    const fns = {home:hHome,wt:hWT,cl:hCL,fl:hFuel,wld:hWelding,gas:hGases,nv:hNV,nbi:hNBI,kl:hKluber,rp:hRopes,ref:hRefrig,wsr:hWSR,ai:hAI,sr:hSrch};
+    const fns = {home:hHome,wt:hWT,cl:hCL,fl:hFuel,wld:hWelding,gas:hGases,nv:hNV,nbi:hNBI,kl:hKluber,rp:hRopes,ref:hRefrig,wsr:hWSR,products:hProducts,myreports:hMyReports,ai:hAI,sr:hSrch};
     rp(id, (fns[id]||hHome)(), 'left');
   }
 }
-function sseg(id) { ['home','wt','cl','fl','wld','gas','ref','kl','rp','nv','nbi','wsr','ai','sr'].forEach(s=>document.getElementById('sn-'+s).classList.toggle('on',s===id)); }
+function sseg(id) { ['home','wt','cl','fl','wld','gas','ref','kl','rp','nv','nbi','wsr','products','myreports','ai','sr'].forEach(s=>{const el=document.getElementById('sn-'+s);if(el)el.classList.toggle('on',s===id);}); }
 function goHome() { sseg('home'); stk=[{id:'home',html:null}]; rp('home', hHome(), 'left'); }
-function goSeg(s) { sseg(s); const fn={wt:hWT,cl:hCL,fl:hFuel,wld:hWelding,gas:hGases,nv:hNV,nbi:hNBI,kl:hKluber,rp:hRopes,ref:hRefrig,wsr:hWSR,ai:hAI,sr:hSrch}[s]; const html=fn?fn():null; stk=[{id:s,html}]; if(html)rp(s,html); }
+function goSeg(s) { sseg(s); const fn={wt:hWT,cl:hCL,fl:hFuel,wld:hWelding,gas:hGases,nv:hNV,nbi:hNBI,kl:hKluber,rp:hRopes,ref:hRefrig,wsr:hWSR,products:hProducts,myreports:hMyReports,ai:hAI,sr:hSrch}[s]; const html=fn?fn():null; stk=[{id:s,html}]; if(html)rp(s,html); }
 function prB(pr) { const l=pr.toLowerCase(); return `<span class="bdg ${l.includes('must')?'b-must':l.includes('good')?'b-gth':'b-opt'}">${pr}</span>`; }
 function bb(b) { return b==='UNITOR'?'b-u':b==='NALFLEET'?'b-n':'b-nd'; }
 
@@ -1879,60 +1889,62 @@ function pRow(it){
 
 // ── HOME ──────────────────────────────────────────────────────────────────────
 function hHome(){
-  const divs=[
-    {seg:'wt',icon:'ti-droplet',color:'var(--accent)',bg:'var(--accent-bg)',title:'Water Treatment',sub:'Boiler  |  Cooling  |  Evaporator  |  Ballast  |  Potable  |  Pool'},
-    {seg:'cl',icon:'ti-spray',color:'var(--accent)',bg:'var(--accent-bg)',title:'Cleaning',sub:'Engine room & deck'},
-    {seg:'fl',icon:'ti-droplet-filled',color:'#B45000',bg:'#FBE8D5',title:'Fuel Treatment',sub:'Heavy fuel  |  Distillate  |  Test kits'},
-    {seg:'wld',icon:'ti-flame',color:'#B02020',bg:'#FDEAED',title:'Welding',sub:'Electrodes & consumables'},
-    {seg:'gas',icon:'ti-cylinder',color:'#0077A8',bg:'#E0F4FC',title:'Gases',sub:'Oxygen, acetylene, argon'},
-    {seg:'nv',icon:'ti-building-warehouse',color:'#2D4A8A',bg:'#E8EEF8',title:'Cargo Hold Cleaning',sub:'Navadan  |  product selector  |  procedures'},
-    {seg:'nbi',icon:'ti-ship',color:'#003057',bg:'#E8EEF8',title:'New Building (NBI)',sub:'Vessel configurator  |  full product package'},
-    {seg:'wsr',icon:'ti-clipboard-text',color:'#0B6E4F',bg:'#E8F5F0',title:'PSE Service Report',sub:'Water treatment  |  on-board inspection  |  PDF'},
-    {seg:'kl',icon:'ti-droplet-filled',color:'var(--amber)',bg:'var(--amber-bg)',title:'Kluber',sub:'Specialty lubricants'},
-    {seg:'ref',icon:'ti-temperature',color:'#C8102E',bg:'#FDEAED',title:'Refrigerants',sub:'Unicool  -  low GWP'},
-    {seg:'rp',icon:'ti-git-branch',color:'var(--green)',bg:'var(--green-bg)',title:'Timm Ropes',sub:'Mooring ropes MEG4'}];
-  return `
-  <div style="background:var(--accent);padding:16px 16px 20px">
-    <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:6px">Marine Products Catalogue</div>
-    <div style="font-size:22px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:8px">All products,<br>one place.</div>
-    <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.6">Water treatment  |  Cleaning  |  Navadan  |  Kluber lubricants  |  Refrigerants  |  Timm ropes</div>
-  </div>
-  <div class="dgrid">
-    ${divs.map(d=>`<div class="dvc" onclick="goSeg('${d.seg}')">
-      <div class="dvc-icon" style="background:${d.bg}"><i class="ti ${d.icon}" style="font-size:18px;color:${d.color}" aria-hidden="true"></i></div>
-      <div class="dvc-title">${d.title}</div>
-      <div class="dvc-sub">${d.sub}</div>
-      <i class="ti ti-arrow-right dvc-arrow" aria-hidden="true"></i>
-    </div>`).join('')}
-    <div class="dvc" onclick="sdmlWiz()">
-      <div class="dvc-icon" style="background:rgba(34,197,94,.12)"><i class="ti ti-calculator" style="font-size:18px;color:#22C55E" aria-hidden="true"></i></div>
-      <div class="dvc-title">SDML Selector</div>
-      <div class="dvc-sub">Rope sizing MEG4</div>
-      <i class="ti ti-arrow-right dvc-arrow" aria-hidden="true"></i>
-    </div>
-  </div>
-  <div style="padding:16px 14px 8px">
-    <div class="stit">Quick access</div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
-      ${[['ti-wand','Boiler wizard','bwiz()'],['ti-snowflake','Cooling selector','cwiz()'],['ti-search','Search all',"goSeg('sr')"],['ti-propeller','Thruster oils',"goSeg('kl')"]].map(([ic,lbl,fn])=>`
-      <button onclick="${fn}" style="display:flex;align-items:center;gap:5px;padding:7px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text2);font-size:11px;font-weight:500;cursor:pointer">
-        <i class="ti ${ic}" style="font-size:12px" aria-hidden="true"></i>${lbl}
-      </button>`).join('')}
-    </div>
-  </div>
-  <div style="margin:8px 14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r14);overflow:hidden">
-    <div style="padding:10px 14px;border-bottom:1px solid var(--border)">
-      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)">Wilhelmsen Ships Service</div>
-    </div>
-    <div style="padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--text3)">
-      <div style="display:flex;align-items:center;gap:5px"><i class="ti ti-phone" style="font-size:13px;color:var(--accent)" aria-hidden="true"></i>+47 67 58 40 00</div>
-      <div style="display:flex;align-items:center;gap:5px"><i class="ti ti-world" style="font-size:13px;color:var(--accent)" aria-hidden="true"></i>wilhelmsen.com</div>
-      <div style="grid-column:span 2;display:flex;align-items:center;gap:5px"><i class="ti ti-map-pin" style="font-size:13px;color:var(--accent)" aria-hidden="true"></i>PO Box 33, NO-1324 Lysaker, Norway</div>
-    </div>
-  </div>`;
+  const rc=(WSR_REPORTS||[]).length;
+  const badge=rc>0?'<span style="position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:9px;background:#DC2626;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;padding:0 4px">'+rc+'</span>':'';
+  const repSub=rc>0?(rc+' saved report'+(rc>1?'s':'')):'No reports yet \u2014 tap PSE Report to get started';
+  const quickLinks=[
+    {icon:'ti-droplet',label:'Water Treatment',color:'#005DAA',seg:'wt'},
+    {icon:'ti-spray',label:'Cleaning',color:'#005DAA',seg:'cl'},
+    {icon:'ti-ship',label:'New Building (NBI)',color:'#003057',seg:'nbi'},
+    {icon:'ti-search',label:'Search Products',color:'#6B7280',seg:'sr'}
+  ];
+  return '<div style="background:var(--bg);min-height:100%">'
+    +'<div style="background:linear-gradient(135deg,#003057,#1A4A7A);padding:24px 16px 20px">'
+    +'<div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:5px">WILHELMSEN SHIPS SERVICE</div>'
+    +'<div style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:6px">WSS Service App</div>'
+    +'<div style="font-size:12px;color:rgba(255,255,255,.65);line-height:1.6">Products catalogue \xb7 PSE service reports \xb7 Vessel database</div>'
+    +'</div>'
+    +'<div style="padding:16px 14px 30px">'
+    // Row 1: Products + PSE Report
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">'
+    +'<div onclick="goSeg(\'products\')" style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:18px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;-webkit-tap-highlight-color:transparent">'
+    +'<div style="width:50px;height:50px;border-radius:14px;background:#E8EEF8;display:grid;place-items:center"><i class="ti ti-package" style="font-size:26px;color:#003057"></i></div>'
+    +'<div style="font-size:13px;font-weight:800;color:var(--text)">Products</div>'
+    +'<div style="font-size:10px;color:var(--text3)">All product ranges</div>'
+    +'</div>'
+    +'<div onclick="goSeg(\'wsr\')" style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:18px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;-webkit-tap-highlight-color:transparent">'
+    +'<div style="width:50px;height:50px;border-radius:14px;background:#E8F5F0;display:grid;place-items:center"><i class="ti ti-clipboard-text" style="font-size:26px;color:#0B6E4F"></i></div>'
+    +'<div style="font-size:13px;font-weight:800;color:var(--text)">Water Service Report</div>'
+    +'<div style="font-size:10px;color:var(--text3)">Water inspection \xb7 PDF</div>'
+    +'</div>'
+    +'</div>'
+    // Row 2: My Reports (full width)
+    +'<div onclick="goSeg(\'myreports\')" style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;margin-bottom:18px;-webkit-tap-highlight-color:transparent">'
+    +'<div style="width:46px;height:46px;border-radius:13px;background:#EFF6FF;display:grid;place-items:center;flex-shrink:0;position:relative">'
+    +'<i class="ti ti-files" style="font-size:24px;color:#1D6FA4"></i>'+badge
+    +'</div>'
+    +'<div style="flex:1">'
+    +'<div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:2px">My Reports</div>'
+    +'<div style="font-size:10px;color:var(--text3)">'+repSub+'</div>'
+    +'</div>'
+    +'<i class="ti ti-chevron-right" style="font-size:17px;color:var(--text3);flex-shrink:0"></i>'
+    +'</div>'
+    // About section
+    +'<div style="background:linear-gradient(135deg,#003057,#1A4A7A);border-radius:14px;padding:16px;margin-bottom:12px">'
+    +'<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px">About WSS Service App</div>'
+    +'<div style="font-size:12px;color:rgba(255,255,255,.85);line-height:1.7;margin-bottom:12px">Built for WSS Port Service Engineers and crew. Explore our full product range, generate professional on-board water treatment reports, and access vessel-specific configurations \u2014 all offline.</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+    +'<div style="background:rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:18px;font-weight:800;color:#4FC3F7">500+</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">Products</div></div>'
+    +'<div style="background:rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;text-align:center"><div style="font-size:18px;font-weight:800;color:#4FC3F7">12</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">Report Sections</div></div>'
+    +'</div></div>'
+    // Quick Access
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden">'
+    +'<div style="padding:10px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);border-bottom:1px solid var(--border)">Quick Access</div>'
+    +quickLinks.map(function(q,i){return '<div onclick="goSeg(\''+q.seg+'\')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:'+(i<3?'1px solid var(--border)':'none')+';cursor:pointer;-webkit-tap-highlight-color:transparent"><i class="ti '+q.icon+'" style="font-size:16px;color:'+q.color+';flex-shrink:0;width:20px;text-align:center"></i><div style="font-size:12px;font-weight:600;color:var(--text);flex:1">'+q.label+'</div><i class="ti ti-chevron-right" style="font-size:13px;color:var(--text3)"></i></div>';}).join('')
+    +'</div>'
+    +'</div></div>';
 }
 
-// ── WATER ─────────────────────────────────────────────────────────────────────
 function hWT(){
   return `<div class="shdr"><div class="str">
     <div class="sico" style="background:var(--accent-bg)"><i class="ti ti-droplet" style="font-size:17px;color:var(--accent)" aria-hidden="true"></i></div>
@@ -4860,6 +4872,7 @@ const WSR_STEPS = [
   {id:'seawater',  label:'Seawater System',    icon:'ti-waves'},
   {id:'waterproof',label:'Waterproof',         icon:'ti-device-laptop'},
   {id:'ballast',   label:'Ballast Water',      icon:'ti-anchor'},
+  {id:'wastewater',label:'Wastewater',           icon:'ti-droplet-off'},
   {id:'photos',    label:'Equipment Photos',   icon:'ti-camera'},
   {id:'rob',       label:'ROB',                icon:'ti-package'},
   {id:'comments',  label:'Comments',           icon:'ti-message'},
@@ -4879,9 +4892,11 @@ function hWSR() {
     potable:{prods:[], freeText:'', dosingMethod:'', corrosionShield:false, lastCartridge:'', discoloration:false, discolorPhoto:null, comments:''},
     seawater:{prods:[], swOther:'', dosingMethod:'', comments:''},
     waterproof:{inUse:'', version:'', comments:''},
-    ballast:{maker:'', sysType:'', chemicals:[], ballastOther:'', chemType:'', dosingUnit:false, dosingUnitNotes:'', comments:''},
+    ballast:{maker:'', sysType:'', chemicals:[], ballastOther:'', chemType:'', dosingUnit:false, comments:''},
+    wastewater:{prods:[], wwOther:'', comments:''},
     photos:[],
-    rob:{items:[], extraItems:[]},
+    rob:{items:[], extraItems:[], mode:'manual', robPhoto:null, scanning:false, scanDone:false, scanMsg:'', scanError:null},
+    _editingId:null,
     comments:{general:''},
   };
   return wsrPage();
@@ -4927,6 +4942,7 @@ function wsrBody(step) {
   if(id==='seawater')  return wsrStepSeawater();
   if(id==='waterproof')return wsrStepWaterproof();
   if(id==='ballast')   return wsrStepBallast();
+  if(id==='wastewater')return wsrStepWastewater();
   if(id==='photos')    return wsrStepPhotos();
   if(id==='rob')       return wsrStepROB();
   if(id==='comments')  return wsrStepComments();
@@ -4978,58 +4994,53 @@ function wsrBadge(val,lo,hi){const c=wsrStC(wsrSt(val,lo,hi));return `<span styl
 
 // ── STEP 1: VESSEL ────────────────────────────────────────────────────────────
 function wsrStepVessel(){return `
-  <div style="background:linear-gradient(135deg,${WSR_ACC},#1A4A7A);border-radius:14px;padding:14px;margin-bottom:14px">
+  <div style="background:linear-gradient(135deg,#1D6FA4,#003057);border-radius:14px;padding:14px;margin-bottom:14px">
     <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px">WILHELMSEN SHIPS SERVICE</div>
-    <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px">PSE Water Service Report</div>
+    <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px">Water Service Report</div>
     <div style="font-size:11px;color:rgba(255,255,255,.65);line-height:1.6">Complete all sections to generate a professional PDF report.</div>
   </div>
-  ${wsrCard(`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div style="grid-column:span 2"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Vessel Name</div><input id="wsr-vessel" value="${WSR.vessel||''}" placeholder="e.g. WIND PACE" onblur="WSR.vessel=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
-      <div><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">IMO Number</div>
-        <div style="display:flex;gap:6px">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">Vessel Name</div>
+    <input id="wsr-vessel" value="${WSR.vessel||''}" placeholder="e.g. WIND PACE" onblur="WSR.vessel=this.value"
+      style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box;margin-bottom:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">IMO Number</div>
+        <div style="display:flex;gap:5px">
           <input id="wsr-imo" value="${WSR.imo||''}" placeholder="9957830" onblur="WSR.imo=this.value;wsrCheckIMO()"
-            style="flex:1;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text)">
-          <button onclick="wsrCheckIMO()" style="padding:9px 12px;background:var(--wblue);border:none;border-radius:9px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">
-            <i class="ti ti-database-search" style="font-size:13px;vertical-align:-2px"></i> Lookup
+            style="flex:1;min-width:0;padding:9px 10px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text)">
+          <button onclick="wsrCheckIMO()" style="padding:9px 10px;background:#1D6FA4;border:none;border-radius:9px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0">
+            <i class="ti ti-database-search" style="font-size:13px"></i>
           </button>
         </div>
-        <div id="wsr-imo-hint" style="margin-top:5px;font-size:11px;min-height:18px"></div>
       </div>
-      <div><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Date</div><input id="wsr-date" type="date" value="${WSR.date||''}" onblur="WSR.date=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
-      <div style="grid-column:span 2"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Customer / Owner</div><input id="wsr-customer" value="${WSR.customer||''}" placeholder="e.g. CADELER A/S" onblur="WSR.customer=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
-      <div style="grid-column:span 2"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Port / Place of Service</div><input id="wsr-port" value="${WSR.port||''}" placeholder="e.g. Esbjerg" onblur="WSR.port=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box"></div>
-    </div>`)}
-  ${wsrCard(`
-    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">Chief Engineer</div><input id="wsr-chiefEngineer" value="${WSR.chiefEngineer||''}" placeholder="Full name" onblur="WSR.chiefEngineer=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box;margin-bottom:10px">
-    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px">WSS Service Engineer (PSE)</div><input id="wsr-pse" value="${WSR.pse||''}" placeholder="Full name" onblur="WSR.pse=this.value" style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box">`)}
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">Date</div>
+        <input id="wsr-date" type="date" value="${WSR.date||''}" onblur="WSR.date=this.value"
+          style="width:100%;padding:9px 10px;border:1.5px solid var(--border2);border-radius:9px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box">
+      </div>
+    </div>
+    <div id="wsr-imo-hint" style="font-size:11px;min-height:16px;margin-bottom:6px"></div>
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">Customer / Owner</div>
+    <input id="wsr-customer" value="${WSR.customer||''}" placeholder="e.g. CADELER A/S" onblur="WSR.customer=this.value"
+      style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">Port / Place of Service</div>
+    <input id="wsr-port" value="${WSR.port||''}" placeholder="e.g. Esbjerg" onblur="WSR.port=this.value"
+      style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box">
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">Chief Engineer</div>
+    <input id="wsr-chiefEngineer" value="${WSR.chiefEngineer||''}" placeholder="Full name" onblur="WSR.chiefEngineer=this.value"
+      style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px">WSS Service Engineer (PSE)</div>
+    <input id="wsr-pse" value="${WSR.pse||''}" placeholder="Full name" onblur="WSR.pse=this.value"
+      style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box">
+  </div>
   ${wsrLbl('Vessel Type')}
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
-    ${['Offshore Support','Bulk Carrier','Tanker','Container','General Cargo','Passenger Vessel','Other'].map(t=>`<button onclick="WSR.type='${t}';wsrRefresh()" style="padding:9px;border-radius:9px;border:1.5px solid ${WSR.type===t?WSR_ACC:'var(--border2)'};background:${WSR.type===t?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:600;color:${WSR.type===t?WSR_ACC:'var(--text2)'};cursor:pointer">${t}</button>`).join('')}
+    ${['Offshore Support','Bulk Carrier','Tanker','Container','General Cargo','Passenger Vessel','Other'].map(t=>`<button onclick="WSR.type='${t}';wsrRefresh()" style="padding:9px;border-radius:9px;border:1.5px solid ${WSR.type===t?WSR_ACC:'var(--border2)'};background:${WSR.type===t?'#EFF6FF':'var(--card)'};font-size:11px;font-weight:600;color:${WSR.type===t?WSR_ACC:'var(--text2)'};cursor:pointer">${t}</button>`).join('')}
   </div>
   ${wsrNxtBtn('Continue to Boiler Water','wsrVesselNext()',!WSR.vessel||!WSR.imo)}`;}
-
-function wsrCheckIMO(){
-  const el = document.getElementById('wsr-imo');
-  if(el) WSR.imo = el.value.trim();
-  const hint = document.getElementById('wsr-imo-hint');
-  if(!hint) return;
-  const vdb = wsrLookupVessel(WSR.imo);
-  if(vdb){
-    hint.innerHTML = '<span style="color:#1D6FA4;font-weight:700"><i class="ti ti-check" style="vertical-align:-2px"></i> Vessel found: <b>' + vdb.name + '</b> — ' + (vdb.boilerSystems?vdb.boilerSystems.length:0) + ' boiler + ' + (vdb.coolSystems?vdb.coolSystems.length:0) + ' cooling systems pre-loaded</span>';
-    // Also pre-fill vessel name and customer if empty
-    const vn = document.getElementById('wsr-vessel');
-    const cu = document.getElementById('wsr-customer');
-    if(vn && !vn.value) { vn.value = vdb.name; WSR.vessel = vdb.name; }
-    if(cu && !cu.value && vdb.customer) { cu.value = vdb.customer; WSR.customer = vdb.customer; }
-    if(!WSR.type && vdb.type) WSR.type = vdb.type;
-    wsrRefresh();
-  } else if(WSR.imo.length >= 7){
-    hint.innerHTML = '<span style="color:#6B7280">No pre-loaded configuration for this IMO — you can fill in the systems manually</span>';
-  } else {
-    hint.innerHTML = '';
-  }
-}
 
 function wsrVesselNext(){
   ['vessel','imo','customer','port','date','chiefEngineer','pse'].forEach(k=>{const el=document.getElementById('wsr-'+k);if(el)WSR[k]=el.value;});
@@ -5440,6 +5451,20 @@ function wsrStepBallast(){
   ${wsrCard(`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Comments</div>
     <textarea onblur="WSR.ballast.comments=this.value" placeholder="Any observations..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:65px;resize:none">${B.comments||''}</textarea>`)}
   ${wsrNxtBtn('Continue to Equipment Photos','wsrNext()')}${wsrSkipBtn()}`;}
+
+function wsrStepWastewater(){
+  const WW=WSR.wastewater;
+  const wwChems=['Bilgewater Flocculant 25L (#690669)','Defoamer Concentrate 25L (#661843)'];
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Wastewater Treatment</div>
+  ${wsrLbl('Chemicals in use',0)}
+  ${wsrMultiChips(wwChems,(WW.prods||[]),'wsrWWProd')}
+  ${wsrCard('<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Others (free text)</div><input value="'+( WW.wwOther||'')+ '" placeholder="Other wastewater chemical..." onblur="WSR.wastewater.wwOther=this.value" style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box">')}
+  ${wsrCard('<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Comments</div><textarea onblur="WSR.wastewater.comments=this.value" placeholder="Bilge observations, dosing notes..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:65px;resize:none">'+(WW.comments||'')+'</textarea>')}
+  ${wsrNxtBtn('Continue to Equipment Photos','wsrNext()')}${wsrSkipBtn()}`;
+}
+function wsrWWProd(p){wsrToggleArr(WSR.wastewater.prods,p);wsrRefresh();}
+
 function wsrBallastType(v){WSR.ballast.sysType=v;wsrRefresh();}
 function wsrBallastChem(p){wsrToggleArr(WSR.ballast.chemicals,p);wsrRefresh();}
 function wsrBallastChemType(v){WSR.ballast.chemType=v;wsrRefresh();}
@@ -5502,6 +5527,18 @@ function wsrStepROB(){
   <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">ROB — Remaining on Board</div>
   <div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5">Choose how to record the remaining stock on board.</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+    <div onclick="WSR.rob.mode='manual';wsrRefresh()" style="background:var(--card);border:2px solid ${WSR.rob.mode==='manual'?'#1D6FA4':'var(--border2)'};border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center">
+      <i class="ti ti-list-check" style="font-size:24px;color:${WSR.rob.mode==='manual'?'#1D6FA4':'var(--text3)'}"></i>
+      <div style="font-size:12px;font-weight:700;color:${WSR.rob.mode==='manual'?'#1D6FA4':'var(--text2)'};margin-top:6px">Enter Manually</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px">Type qty per product</div>
+    </div>
+    <div onclick="WSR.rob.mode='photo';wsrRefresh()" style="background:var(--card);border:2px solid ${WSR.rob.mode==='photo'?'#1D6FA4':'var(--border2)'};border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center">
+      <i class="ti ti-camera" style="font-size:24px;color:${WSR.rob.mode==='photo'?'#1D6FA4':'var(--text3)'}"></i>
+      <div style="font-size:12px;font-weight:700;color:${WSR.rob.mode==='photo'?'#1D6FA4':'var(--text2)'};margin-top:6px">Photo of ROB List</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px">Scan & auto-fill</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
     <div onclick="WSR.rob.mode='manual';wsrRefresh()" style="padding:14px 12px;border-radius:12px;border:2px solid ${WSR.rob.mode==='manual'?'#1D6FA4':'var(--border2)'};background:${WSR.rob.mode==='manual'?'#EFF6FF':'var(--card)'};cursor:pointer;text-align:center">
       <i class="ti ti-list-check" style="font-size:24px;color:${WSR.rob.mode==='manual'?'#1D6FA4':'var(--text3)'}"></i>
       <div style="font-size:12px;font-weight:700;color:${WSR.rob.mode==='manual'?'#1D6FA4':'var(--text2)'};margin-top:6px">Enter Manually</div>
@@ -5523,9 +5560,12 @@ function wsrStepROB(){
       <button onclick="WSR.rob.robPhoto=null;wsrRefresh()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);border:none;border-radius:50%;width:24px;height:24px;display:grid;place-items:center;cursor:pointer"><i class="ti ti-x" style="font-size:11px;color:#fff"></i></button>
     </div>`:''}
     <label style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#1D6FA4;border-radius:10px;cursor:pointer;color:#fff;font-size:12px;font-weight:700">
-      <i class="ti ti-camera" style="font-size:14px"></i> ${WSR.rob.robPhoto?'Retake Photo':'Take / Upload Photo'}
+      <i class="ti ti-camera" style="font-size:14px"></i> ${WSR.rob.robPhoto?'Retake':'Take / Upload Photo'}
       <input type="file" accept="image/*" style="display:none" onchange="wsrROBPhoto(this)">
     </label>
+    ${WSR.rob.robPhoto&&!WSR.rob.scanDone?`<button onclick="wsrROBScan()" ${WSR.rob.scanning?'disabled':''} style="margin-left:8px;display:inline-flex;align-items:center;gap:7px;padding:10px 18px;background:${WSR.rob.scanning?'#6B7280':'#0B6E4F'};border:none;border-radius:10px;cursor:pointer;color:#fff;font-size:12px;font-weight:700">${WSR.rob.scanning?'Scanning...':'<i class=\"ti ti-sparkles\" style=\"font-size:13px\"></i> Scan & Auto-fill'}</button>`:''}
+    ${WSR.rob.scanDone?`<div style="margin-top:10px;padding:8px 12px;background:#E8F5E9;border:1px solid #A5D6A7;border-radius:9px;font-size:11px;color:#155D32;font-weight:600">✓ ${WSR.rob.scanMsg||'Scan complete'}</div>`:''}
+    ${WSR.rob.scanError?`<div style="margin-top:10px;padding:8px 12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:9px;font-size:11px;color:#991B1B">${WSR.rob.scanError}</div>`:''}
   </div>`:``}
   ${WSR.rob.mode==='manual'?`<div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.5">Enter remaining stock (litres or kg) for each product selected in this report.</div>
   ${allProds.length?allProds.map((p,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px">
@@ -5565,6 +5605,37 @@ function wsrROBPhoto(input){
   r.readAsDataURL(input.files[0]);
 }
 
+
+function wsrROBScan(){
+  if(!WSR.rob.robPhoto)return;
+  WSR.rob.scanning=true; WSR.rob.scanDone=false; WSR.rob.scanError=null;
+  wsrRefresh();
+  const b64=WSR.rob.robPhoto.split(',')[1];
+  const mime=(WSR.rob.robPhoto.match(/data:([^;]+);/)||[,'image/jpeg'])[1];
+  const selectedProds=wsrCollectAllProds();
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+      {type:'text',text:'This is a ship ROB (remaining on board) chemical inventory list. Extract ALL product names and quantities. Return ONLY a JSON array, no markdown: [{"product":"name","qty":"25L"}]. Known products: '+selectedProds.join(', ')+'. Include all visible products even if not in known list.'}
+    ]}]})
+  }).then(r=>r.json()).then(data=>{
+    let txt=(data.content&&data.content[0]?data.content[0].text:'')||'';
+    txt=txt.replace(/```json|```/g,'').trim();
+    let parsed=[]; try{parsed=JSON.parse(txt);}catch(e){throw new Error('Could not parse scan result');}
+    const allProds=wsrCollectAllProds(); let filled=0; let newCount=0;
+    parsed.forEach(item=>{
+      const pName=item.product||''; const pQty=item.qty||''; if(!pName)return;
+      const matchIdx=allProds.findIndex(p=>p.toLowerCase().includes(pName.toLowerCase().substring(0,8))||pName.toLowerCase().includes(p.toLowerCase().substring(0,8)));
+      if(matchIdx>=0){if(!WSR.rob.items[matchIdx])WSR.rob.items[matchIdx]={prod:allProds[matchIdx],qty:''};WSR.rob.items[matchIdx].qty=pQty;filled++;}
+      else{const alreadyExtra=(WSR.rob.extraItems||[]).some(e=>e.prod.toLowerCase().includes(pName.toLowerCase().substring(0,6)));if(!alreadyExtra){if(!WSR.rob.extraItems)WSR.rob.extraItems=[];WSR.rob.extraItems.push({prod:pName,qty:pQty});newCount++;}}
+    });
+    WSR.rob.scanning=false; WSR.rob.scanDone=true;
+    WSR.rob.scanMsg='Found '+parsed.length+' products: '+filled+' matched to report, '+newCount+' new added below';
+    wsrRefresh();
+  }).catch(err=>{WSR.rob.scanning=false;WSR.rob.scanError='Scan failed: '+(err.message||'Check connection');wsrRefresh();});
+}
+
 function wsrCollectAllProds(){
   const all=new Set();
   (WSR.boilerProds||[]).forEach(p=>all.add(p));
@@ -5576,6 +5647,8 @@ function wsrCollectAllProds(){
   if(WSR.seawater.swOther&&WSR.seawater.swOther.trim())all.add(WSR.seawater.swOther.trim());
   (WSR.ballast.chemicals||[]).forEach(p=>all.add(p));
   if(WSR.ballast.ballastOther&&WSR.ballast.ballastOther.trim())all.add(WSR.ballast.ballastOther.trim());
+  (WSR.wastewater&&WSR.wastewater.prods||[]).forEach(p=>all.add(p));
+  if(WSR.wastewater&&WSR.wastewater.wwOther&&WSR.wastewater.wwOther.trim())all.add(WSR.wastewater.wwOther.trim());
   return [...all];
 }
 
@@ -5826,6 +5899,11 @@ ${W.sysType&&W.sysType!=='None'?`<div class="section">
   ${P.comments?`<div style="font-size:10px;color:#374151;margin-top:4px">${P.comments}</div>`:''}
 </div>
 
+${WSR.wastewater&&(WSR.wastewater.prods.length||WSR.wastewater.wwOther)?`<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">WW</div><div class="sec-title">Wastewater Treatment</div></div>
+  ${WSR.wastewater.prods.length?`<div style="margin-bottom:6px"><span style="font-size:9px;color:#6B7280;font-weight:700">Chemicals: </span>${WSR.wastewater.prods.map(p=>`<span class="chip chip-blue">${p}</span>`).join('')}${WSR.wastewater.wwOther?`<span class="chip chip-blue">${WSR.wastewater.wwOther}</span>`:''}</div>`:''}
+  ${WSR.wastewater.comments?`<div style="font-size:10px;color:#374151">${WSR.wastewater.comments}</div>`:''}
+</div>`:''}
 ${S.prods&&S.prods.length||S.swOther?`<div class="section">
   <div class="sec-hdr"><div class="sec-icon">SW</div><div class="sec-title">Seawater System</div></div>
   ${S.prods&&S.prods.length?`<div style="margin-bottom:6px"><span style="font-size:8px;color:#6B7280;font-weight:700">Chemicals: </span>${S.prods.map(p=>`<span class="chip chip-blue">${p}</span>`).join('')}${S.swOther?`<span class="chip chip-blue">${S.swOther}</span>`:''}</div>`:''}
@@ -5895,6 +5973,7 @@ ${WSR.comments.general?`<div class="section">
 </div>
 </body></html>`;
 
+  wsrSaveReport(html,{vessel:WSR.vessel,imo:WSR.imo,customer:WSR.customer,port:WSR.port,date:WSR.date,pse:WSR.pse});
   const blob=new Blob([html],{type:'text/html'});
   const url=URL.createObjectURL(blob);
   const w=window.open(url,'_blank');
@@ -5951,6 +6030,110 @@ function wsrClosePopup(){
   document.body.style.overflow='';
   _wsrPopupIdx=-1;
 }
+
+
+// ── PRODUCTS HUB ──────────────────────────────────────────────────────────────
+function hProducts(){
+  const cats=[
+    {seg:'wt',  icon:'ti-droplet',           color:'#005DAA',bg:'#E8F0FA',title:'Water Treatment',    sub:'Boiler · Cooling · Evaporator · Ballast · Potable'},
+    {seg:'cl',  icon:'ti-spray',             color:'#005DAA',bg:'#E8F0FA',title:'Cleaning',            sub:'Engine room · Deck · Tank · Biological'},
+    {seg:'fl',  icon:'ti-droplet-filled',    color:'#B45000',bg:'#FBE8D5',title:'Fuel Treatment',      sub:'Heavy fuel · Distillate · Test kits'},
+    {seg:'wld', icon:'ti-flame',             color:'#B02020',bg:'#FDEAED',title:'Welding',             sub:'Electrodes & consumables'},
+    {seg:'gas', icon:'ti-cylinder',          color:'#0077A8',bg:'#E0F4FC',title:'Gases',              sub:'Oxygen · Acetylene · Argon'},
+    {seg:'nv',  icon:'ti-building-warehouse',color:'#2D4A8A',bg:'#E8EEF8',title:'Cargo Hold Cleaning',sub:'Navadan · Procedures'},
+    {seg:'nbi', icon:'ti-ship',              color:'#003057',bg:'#E8EEF8',title:'New Building (NBI)', sub:'Vessel configurator · Full package'},
+    {seg:'kl',  icon:'ti-droplet-filled',    color:'#8B6914',bg:'#FDF3D8',title:'Klüber Lubricants',  sub:'Specialty lubricants · EAL'},
+    {seg:'ref', icon:'ti-temperature',       color:'#C8102E',bg:'#FDEAED',title:'Refrigerants',        sub:'Unicool · Low GWP'},
+    {seg:'rp',  icon:'ti-git-branch',        color:'#155D32',bg:'#E8F5E9',title:'Timm Ropes',         sub:'Mooring ropes · MEG4'},
+  ];
+  return `<div style="background:var(--bg);min-height:100%">
+    <div style="background:#003057;padding:13px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10">
+      <button onclick="goHome()" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;width:30px;height:30px;display:grid;place-items:center;cursor:pointer;flex-shrink:0"><i class="ti ti-arrow-left" style="font-size:13px;color:#fff"></i></button>
+      <div style="font-size:15px;font-weight:700;color:#fff">Products</div>
+    </div>
+    <div style="padding:12px 14px 24px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:12px">Select a product range to explore</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${cats.map(c=>`<div onclick="goSeg('${c.seg}')" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;cursor:pointer;display:flex;align-items:center;gap:12px">
+          <div style="width:42px;height:42px;border-radius:11px;background:${c.bg};display:grid;place-items:center;flex-shrink:0"><i class="ti ${c.icon}" style="font-size:22px;color:${c.color}"></i></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">${c.title}</div><div style="font-size:11px;color:var(--text3)">${c.sub}</div></div>
+          <i class="ti ti-chevron-right" style="font-size:16px;color:var(--text3);flex-shrink:0"></i>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;}
+
+// ── MY REPORTS ────────────────────────────────────────────────────────────────
+let WSR_REPORTS = [];
+try { WSR_REPORTS = JSON.parse(localStorage.getItem('wsr_reports')||'[]'); } catch(e){}
+
+function wsrSaveReport(html, meta){
+  const snapshot = JSON.parse(JSON.stringify(WSR));
+  delete snapshot._editingId;
+  const editIdx = WSR._editingId ? (WSR_REPORTS||[]).findIndex(r=>r.id===WSR._editingId) : -1;
+  const rep={id: editIdx>=0 ? WSR._editingId : Date.now(),
+    date:meta.date||new Date().toISOString().split('T')[0],
+    vessel:meta.vessel||'Unknown',imo:meta.imo||'—',customer:meta.customer||'—',
+    port:meta.port||'—',pse:meta.pse||'—',html,wsrData:snapshot};
+  if(editIdx>=0){ WSR_REPORTS[editIdx]=rep; }
+  else { WSR_REPORTS.unshift(rep); }
+  if(WSR_REPORTS.length>50) WSR_REPORTS=WSR_REPORTS.slice(0,50);
+  try{localStorage.setItem('wsr_reports',JSON.stringify(WSR_REPORTS));}catch(e){}
+  WSR._editingId=null;
+}
+
+function wsrDeleteReport(id){
+  WSR_REPORTS=WSR_REPORTS.filter(r=>r.id!==id);
+  try{localStorage.setItem('wsr_reports',JSON.stringify(WSR_REPORTS));}catch(e){}
+  rp('myreports',hMyReports());
+}
+
+function hMyReports(){
+  const reps=WSR_REPORTS||[];
+  return `<div style="background:var(--bg);min-height:100%">
+    <div style="background:#003057;padding:13px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10">
+      <button onclick="goHome()" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;width:30px;height:30px;display:grid;place-items:center;cursor:pointer;flex-shrink:0"><i class="ti ti-arrow-left" style="font-size:13px;color:#fff"></i></button>
+      <div style="font-size:15px;font-weight:700;color:#fff;flex:1">My Reports</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.5)">${reps.length} saved</div>
+    </div>
+    <div style="padding:12px 14px 24px">
+      ${reps.length===0?`<div style="text-align:center;padding:40px 20px">
+        <i class="ti ti-files" style="font-size:48px;color:var(--text3);display:block;margin-bottom:12px"></i>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">No saved reports yet</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.6;margin-bottom:18px">Reports are saved automatically when you generate a PDF from the PSE Report tool</div>
+        <button onclick="goSeg('wsr')" style="padding:12px 24px;background:#1D6FA4;border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Start a Report</button>
+      </div>`:reps.map(r=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:8px">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div style="width:38px;height:38px;border-radius:10px;background:#EFF6FF;display:grid;place-items:center;flex-shrink:0"><i class="ti ti-file-text" style="font-size:20px;color:#1D6FA4"></i></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">${r.vessel} <span style="font-size:11px;font-weight:500;color:var(--text3)">(IMO: ${r.imo})</span></div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:1px">${r.customer}</div>
+            <div style="font-size:11px;color:var(--text3)">${r.date} · ${r.port||'—'} · ${r.pse||'—'}</div>
+          </div>
+          <button onclick="wsrDeleteReport(${r.id})" style="background:var(--red-bg);border:none;border-radius:8px;width:30px;height:30px;display:grid;place-items:center;cursor:pointer;flex-shrink:0"><i class="ti ti-trash" style="font-size:13px;color:var(--red)"></i></button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <button onclick="wsrOpenReport(${r.id})" style="flex:1;padding:8px;background:#1D6FA4;border:none;border-radius:9px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px"><i class="ti ti-eye" style="font-size:12px"></i> View</button>
+          <button onclick="wsrEditReport(${r.id})" style="flex:1;padding:8px;background:#0B6E4F;border:none;border-radius:9px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px"><i class="ti ti-edit" style="font-size:12px"></i> Edit</button>
+          <button onclick="wsrRePrintReport(${r.id})" style="flex:1;padding:8px;background:transparent;border:1.5px solid #1D6FA4;border-radius:9px;color:#1D6FA4;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px"><i class="ti ti-printer" style="font-size:12px"></i> Print</button>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;}
+
+function wsrOpenReport(id){const rep=(WSR_REPORTS||[]).find(r=>r.id===id);if(!rep)return;window.open(URL.createObjectURL(new Blob([rep.html],{type:'text/html'})),'_blank');}
+function wsrEditReport(id){
+  const rep=(WSR_REPORTS||[]).find(r=>r.id===id);
+  if(!rep||!rep.wsrData)return alert('This report was saved with an older version — editing not available. Please regenerate the report to enable editing.');
+  // Restore WSR state from saved snapshot
+  WSR=JSON.parse(JSON.stringify(rep.wsrData));
+  WSR._editingId=id;  // track which report we are editing
+  WSR.step=0;
+  stk=[{id:'wsr',html:null}];
+  sseg('wsr');
+  rp('wsr',wsrPage());
+}
+function wsrRePrintReport(id){const rep=(WSR_REPORTS||[]).find(r=>r.id===id);if(!rep)return;const url=URL.createObjectURL(new Blob([rep.html],{type:'text/html'}));const w=window.open(url,'_blank');if(w)w.onload=()=>setTimeout(()=>w.print(),500);}
 
 
 // ── INIT ───────────────────────────────────────────────────────────────────────
