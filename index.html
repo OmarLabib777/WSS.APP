@@ -4876,6 +4876,7 @@ const WSR_STEPS = [
   {id:'photos',    label:'Equipment Photos',   icon:'ti-camera'},
   {id:'rob',       label:'ROB',                icon:'ti-package'},
   {id:'comments',  label:'Comments',           icon:'ti-message'},
+  {id:'signature', label:'Signatures',          icon:'ti-writing-sign'},
   {id:'preview',   label:'Preview & Export',   icon:'ti-file-text'},
 ];
 
@@ -4884,7 +4885,7 @@ function hWSR() {
     step:0, vessel:'', imo:'', type:'', customer:'', port:'',
     date: new Date().toISOString().split('T')[0],
     chiefEngineer:'', pse:'',
-    boiler:[], boilerProds:[], boilerTestKit:'', boilerReagent:'',
+    boiler:[], boilerProds:[], boilerTestKit:'', boilerTestKitNames:[], boilerReagent:'',
     boilerLimits:{ph:{lo:9.5,hi:11}, pAlk:{lo:150,hi:300}, chloride:{lo:0,hi:200}, deha:{lo:0.1,hi:0.5}, conductivity:{lo:0,hi:2500}},
     cooling:[], coolProds:[],
     coolingLimits:{nitrite:{lo:1000,hi:3000}, ph:{lo:8,hi:11}, chloride:{lo:0,hi:50}, conductivity:{lo:3000,hi:5000}},
@@ -4897,6 +4898,8 @@ function hWSR() {
     photos:[],
     rob:{items:[], extraItems:[], mode:'manual', robPhoto:null, scanning:false, scanDone:false, scanMsg:'', scanError:null},
     _editingId:null,
+    signatures:{pse:null, chiefEngineer:null},
+    selectedConsumables:{},
     comments:{general:''},
   };
   return wsrPage();
@@ -4946,6 +4949,7 @@ function wsrBody(step) {
   if(id==='photos')    return wsrStepPhotos();
   if(id==='rob')       return wsrStepROB();
   if(id==='comments')  return wsrStepComments();
+  if(id==='signature') return wsrStepSignature();
   if(id==='preview')   return wsrStepPreview();
   return '';
 }
@@ -4957,6 +4961,7 @@ function wsrRefresh() {
   const cur = pw.querySelector('.pg.active');
   if(cur){const sy=cur.scrollTop;cur.innerHTML=html;cur.scrollTop=sy;}
   else rp('wsr',html);
+  setTimeout(()=>{wsrInitSigCanvas('sig-pse','pse');wsrInitSigCanvas('sig-ce','ce');},50);
 }
 function wsrBack(){if(WSR.step>0){WSR.step--;wsrRefresh();}else goBack();}
 function wsrNext(){if(WSR.step<WSR_STEPS.length-1){WSR.step++;wsrRefresh();}}
@@ -5111,16 +5116,31 @@ function wsrStepBoiler(){
   ${wsrMultiChips(['Autotreat','Combitreat','Oxygen Scavenger Plus','Boiler Coagulant','Condensate Control','Alkalinity Control','BWT Liquid Plus','Liquidtreat','Maxitreat'],(WSR.boilerProds||[]),'wsrToggleBP')}
   ${wsrLbl('Test Kit & Reagent Check',10)}
   ${wsrCard(`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-weight:600">Right test kit in use?</div>${wsrYN(WSR.boilerTestKit,'wsrBoilerTK')}</div>
-      <div><div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-weight:600">Reagent within expiry date?</div>${wsrYN(WSR.boilerReagent,'wsrBoilerRE')}</div>
-    </div>`)}
+    <div style="margin-bottom:10px">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-weight:600">Right test kit in use?</div>
+      ${wsrYN(WSR.boilerTestKit,'wsrBoilerTK')}
+    </div>
+    ${WSR.boilerTestKit==='Yes'?`<div style="margin-bottom:10px">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-weight:600">Which test kit?</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${['Spectrapak 310 (#739474)','DEHA Checkit Test Kit (#698948)'].map(k=>`<button onclick="wsrToggleBoilerTKName('${k}')" style="padding:5px 11px;border-radius:16px;border:1.5px solid ${(WSR.boilerTestKitNames||[]).includes(k)?WSR_ACC:'var(--border2)'};background:${(WSR.boilerTestKitNames||[]).includes(k)?'#EFF6FF':'var(--card)'};font-size:10px;font-weight:600;color:${(WSR.boilerTestKitNames||[]).includes(k)?WSR_ACC:'var(--text3)'};cursor:pointer">${k}</button>`).join('')}
+      </div>
+    </div>`:''}
+    <div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:5px;font-weight:600">Reagent within expiry date?</div>
+      ${wsrYN(WSR.boilerReagent,'wsrBoilerRE')}
+    </div>
+    ${WSR.boilerReagent==='No'?`<div style="margin-top:8px;padding:8px 10px;background:#FEF2F2;border-radius:8px;font-size:10px;color:#991B1B;line-height:1.5">
+      ⚠ Expired reagents will be added to recommended consumables in the report
+    </div>`:''}
+  `)}
   ${alerts?`<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 12px;margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:#991B1B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">⚠ System Alerts</div>${alerts}</div>`:''}
   ${wsrNxtBtn('Continue to Cooling Water','wsrNext()')}${wsrSkipBtn()}`;}
 
 function wsrNewBoilerRow(){return{name:'',capacity:'',pAlk:'',ph:'',chloride:'',deha:'',conductivity:'',makeup:'',dosing:'Manual',blowdown:'',appearance:''};}
 function wsrToggleBP(p){wsrToggleArr(WSR.boilerProds,p);wsrRefresh();}
-function wsrBoilerTK(v){WSR.boilerTestKit=v;wsrRefresh();}
+function wsrBoilerTK(v){WSR.boilerTestKit=v;if(v==='No')WSR.boilerTestKitNames=[];wsrRefresh();}
+function wsrToggleBoilerTKName(k){if(!WSR.boilerTestKitNames)WSR.boilerTestKitNames=[];wsrToggleArr(WSR.boilerTestKitNames,k);wsrRefresh();}
 function wsrBoilerRE(v){WSR.boilerReagent=v;wsrRefresh();}
 
 function wsrBoilerRow(r,i,L){
@@ -5166,25 +5186,136 @@ function wsrBoilerRow(r,i,L){
     </div>
   </div>`;}
 
+
+// ── DOSING CHART HELPERS ──────────────────────────────────────────────────────
+function wsrAutotreeDose(pAlk){
+  // Autotreat dosing chart: P-Alk 0→2.4, 50→1.8, 100→1.2, 150→0.6, 200+→0 (Blowdown)
+  const chart=[[0,2.4],[50,1.8],[100,1.2],[150,0.6],[200,0],[225,0],[300,0]];
+  const v=parseFloat(pAlk);
+  if(isNaN(v))return null;
+  if(v>=200)return 'P-Alk is ≥200 — reduce dosage to 0 and increase blowdown frequency.';
+  for(let i=0;i<chart.length-1;i++){
+    const [x0,y0]=[chart[i][0],chart[i][1]];
+    const [x1,y1]=[chart[i+1][0],chart[i+1][1]];
+    if(v>=x0&&v<x1){
+      const dose=(y0+(y1-y0)*(v-x0)/(x1-x0)).toFixed(1);
+      return 'Recommended Autotreat dose: '+dose+' L/m³ feed water (from dosing chart).';
+    }
+  }
+  return null;
+}
+
+function wsrOSPDose(deha){
+  const v=parseFloat(deha);
+  if(isNaN(v))return null;
+  if(v<0.08)return 'DEHA below 0.08 ppm — increase Oxygen Scavenger Plus dose by 25% (per dosing chart: <0.08 ppm = +25%).';
+  if(v>0.30)return 'DEHA above 0.30 ppm — decrease Oxygen Scavenger Plus dose by 25% (per dosing chart: >0.30 ppm = −25%).';
+  return null;
+}
+
+function wsrRocorDose(nitrite){
+  // Rocor NB chart: Nitrite 0→13.0, 180→11.3, 360→9.7, 540→8.1, 720→6.5, 900→4.9, 1080→3.3, 1260→1.7, 1440-2400→0
+  const chart=[[0,13.0],[180,11.3],[360,9.7],[540,8.1],[720,6.5],[900,4.9],[1080,3.3],[1260,1.7],[1440,0]];
+  const v=parseFloat(nitrite);
+  if(isNaN(v)||v<0)return null;
+  if(v>=1440)return 'Nitrite within range — no corrective dose needed.';
+  for(let i=0;i<chart.length-1;i++){
+    const [x0,y0]=[chart[i][0],chart[i][1]];
+    const [x1,y1]=[chart[i+1][0],chart[i+1][1]];
+    if(v>=x0&&v<x1){
+      const dose=(y0+(y1-y0)*(v-x0)/(x1-x0)).toFixed(1);
+      return 'Recommended Rocor NB Liquid dose: '+dose+' L per 1,000 L system volume (from dosing chart).';
+    }
+  }
+  return null;
+}
+
+// Consumables catalogue per test kit
+const WSR_CONSUMABLES = {
+  'Spectrapak 310 (#739474)': [
+    {p:'555664', name:'P-Alkalinity Tablets 2×250 (#555664)', desc:'P-Alkalinity test for boiler water'},
+    {p:'739458', name:'Chloride Test Tablets 2×250 (#739458)', desc:'Chloride test for boiler & cooling'},
+    {p:'555706', name:'pH Paper + pH Reagent (#555706)', desc:'pH measurement (7.5–14 & 6.5–10)'},
+  ],
+  'DEHA Checkit Test Kit (#698948)': [
+    {p:'698753', name:'DEHA Test Tablets Refill 2×100 (#698753)', desc:'DEHA tablet refill for Checkit comparator'},
+    {p:'698761', name:'DEHA Test Solution Refill 2×65ml (#698761)', desc:'DEHA liquid reagent refill'},
+    {p:'698762', name:'DEHA Checkit Disc (#698762)', desc:'Replacement colour disc'},
+    {p:'778423', name:'Checkit Test Cells 10ml (#778423)', desc:'Replacement test cells (need 2 per test)'},
+  ],
+  'Spectrapak 309 (#739466)': [
+    {p:'555623', name:'Nitrite No.1 Tablets 2×100 (#555623)', desc:'Nitrite N1 for low range measurement'},
+    {p:'555631', name:'Nitrite No.2 Tablets 2×250 (#555631)', desc:'Nitrite N2 for high range measurement'},
+    {p:'739458', name:'Chloride Test Tablets 2×250 (#739458)', desc:'Chloride test'},
+    {p:'555698', name:'pH Paper F/309 Test Kit (#555698)', desc:'pH paper specific for Spectrapak 309'},
+    {p:'739423', name:'Shaker Tube 309 Test Kit (#739423)', desc:'Replacement shaker tube'},
+  ],
+  'Mortoship Nitrite Test Kit (#739414)': [
+    {p:'739422', name:'Mortoship Nitrite Refill Tablets (#739422)', desc:'Nitrite tablet refill for Mortoship kit'},
+  ],
+};
+
+function wsrCollectRecommendedChems(){
+  // Build list of kits needing refills with their consumables
+  const kitConsumables={}; // kitName → Set of consumable keys
+  const tkKits=new Set();
+  // Boiler expired
+  if(WSR.boilerReagent==='No'){
+    const kits=(WSR.boilerTestKitNames&&WSR.boilerTestKitNames.length)?WSR.boilerTestKitNames:['Spectrapak 310 (#739474)','DEHA Checkit Test Kit (#698948)'];
+    kits.forEach(k=>{
+      const key=Object.keys(WSR_CONSUMABLES).find(ck=>k.includes(ck.split(' ')[0])||ck.includes(k.split(' ')[0]));
+      if(key){
+        if(!kitConsumables[key])kitConsumables[key]=new Set(WSR.selectedConsumables&&WSR.selectedConsumables[key]?WSR.selectedConsumables[key]:[]);
+        if(!(WSR.selectedConsumables&&WSR.selectedConsumables[key])){
+          WSR_CONSUMABLES[key].forEach(c=>kitConsumables[key].add(c.p));
+        }
+      }
+    });
+  }
+  // Cooling expired
+  WSR.cooling.forEach(r=>{
+    if(r.reagent==='No'){
+      const kits=(r.testKitNames&&r.testKitNames.length)?r.testKitNames:['Spectrapak 309 (#739466)','Mortoship Nitrite Test Kit (#739414)'];
+      kits.forEach(k=>{
+        const key=Object.keys(WSR_CONSUMABLES).find(ck=>k.includes(ck.split(' ')[0])||ck.includes(k.split(' ')[0]));
+        if(key){
+          if(!kitConsumables[key])kitConsumables[key]=new Set(WSR.selectedConsumables&&WSR.selectedConsumables[key]?WSR.selectedConsumables[key]:[]);
+          if(!(WSR.selectedConsumables&&WSR.selectedConsumables[key])){
+            WSR_CONSUMABLES[key].forEach(c=>kitConsumables[key].add(c.p));
+          }
+        }
+      });
+    }
+  });
+  // GLS
+  const glsNeeded=[];
+  WSR.boiler.forEach(r=>{ if(r.appearance&&r.appearance!=='Clear') glsNeeded.push('Boiler — '+r.name); });
+  WSR.cooling.forEach(r=>{ if(r.appearance&&r.appearance!=='Clear') glsNeeded.push('Cooling — '+r.name); });
+  if(WSR.potable&&WSR.potable.discoloration) glsNeeded.push('Potable Water');
+  return {kitConsumables, gls:glsNeeded};
+}
+
 function wsrBoilerAlerts(){
   const L=WSR.boilerLimits; const out=[];
   WSR.boiler.forEach(r=>{
     const nm=r.name||'Unnamed';
     [['ph','pH',L.ph],['pAlk','P.Alkalinity',L.pAlk],['chloride','Chloride',L.chloride],['deha','DEHA',L.deha],['conductivity','Conductivity',L.conductivity]].forEach(([fld,lbl,cl])=>{
       if(!r[fld])return;const st=wsrSt(r[fld],cl.lo,cl.hi);
-      if(st==='low')out.push(`<div style="font-size:11px;color:#991B1B;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FEF2F2;border-radius:6px"><b>${nm} — ${lbl} LOW (${r[fld]}):</b> ${wsrBoilerMsg(fld,'low')}</div>`);
-      if(st==='high')out.push(`<div style="font-size:11px;color:#92400E;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FFFBEB;border-radius:6px"><b>${nm} — ${lbl} HIGH (${r[fld]}):</b> ${wsrBoilerMsg(fld,'high')}</div>`);
+      if(st==='low')out.push(`<div style="font-size:11px;color:#991B1B;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FEF2F2;border-radius:6px"><b>${nm} — ${lbl} LOW (${r[fld]}):</b> ${wsrBoilerMsg(fld,'low',r[fld])}</div>`);
+      if(st==='high')out.push(`<div style="font-size:11px;color:#92400E;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FFFBEB;border-radius:6px"><b>${nm} — ${lbl} HIGH (${r[fld]}):</b> ${wsrBoilerMsg(fld,'high',r[fld])}</div>`);
     });
   });
   return out.join('');
 }
-function wsrBoilerMsg(fld,dir){
+function wsrBoilerMsg(fld,dir,rowVal){
+  const extra = fld==='pAlk'&&dir==='low' ? ' '+( wsrAutotreeDose(rowVal)||'' ) :
+                fld==='deha'&&(dir==='low'||dir==='high') ? ' '+(wsrOSPDose(rowVal)||'') : '';
   const m={
-    ph:{low:'Low pH — insufficient scale control. Increase Autotreat dosage.',high:'High pH — risk of carryover and caustic attack. Reduce Autotreat dosage.'},
-    pAlk:{low:'Low P-Alkalinity — insufficient corrosion protection. Increase Autotreat dosage.',high:'High P-Alkalinity — foaming risk. Increase blowdown frequency to reduce concentration.'},
+    ph:{low:'Low pH — insufficient scale control. Increase Autotreat dosage per dosing chart.',high:'High pH — risk of carryover and caustic attack. Reduce Autotreat dosage.'},
+    pAlk:{low:'Low P-Alkalinity — insufficient corrosion protection. Increase Autotreat dosage.'+extra,high:'High P-Alkalinity — foaming risk. Increase blowdown frequency to reduce concentration.'},
     chloride:{low:'',high:'High Chloride — check for seawater/cooler leaks. Increase blowdown frequency.'},
-    deha:{low:'Low DEHA — dissolved oxygen risk, corrosion in condensate lines. Increase Oxygen Scavenger Plus dosage.',high:'DEHA excessive — reduce dosage.'},
-    conductivity:{low:'',high:'High Conductivity — high TDS, foaming and carryover risk. Increase blowdown. Consider Boiler Coagulant (20 ml/1,000 L) if water is discoloured.'}
+    deha:{low:'Low DEHA — dissolved oxygen risk. Increase Oxygen Scavenger Plus dosage.'+extra,high:'DEHA excessive — decrease OSP dosage.'+extra},
+    conductivity:{low:'',high:'High Conductivity — foaming risk. Increase blowdown. Consider Boiler Coagulant (20 ml/1,000 L) if water is discoloured.'}
   };
   return (m[fld]&&m[fld][dir])||'Check system and adjust dosage.';
 }
@@ -5217,6 +5348,11 @@ function wsrStepCooling(){
 function wsrNewCoolRow(){return{name:'',capacity:'',nitrite:'',ph:'',chloride:'',conductivity:'',pAlk:'',makeup:'',dosing:'Manual',appearance:'',oilContam:'',testKit:'',reagent:''};}
 function wsrToggleCP(p){wsrToggleArr(WSR.coolProds,p);wsrRefresh();}
 function wsrCoolSet(i,field,val){if(WSR.cooling[i])WSR.cooling[i][field]=val;wsrRefresh();}
+function wsrCoolToggleTK(i,k){
+  if(!WSR.cooling[i])return;
+  if(!WSR.cooling[i].testKitNames)WSR.cooling[i].testKitNames=[];
+  wsrToggleArr(WSR.cooling[i].testKitNames,k);wsrRefresh();
+}
 
 function wsrCoolRow(r,i,L){
   const fields=[
@@ -5258,11 +5394,15 @@ function wsrCoolRow(r,i,L){
       <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Oil Contamination?</div>
         <div style="display:flex;gap:5px">${['Yes','No'].map(v=>`<button onclick="wsrCoolSet(${i},'oilContam','${v}')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid ${r.oilContam===v?'#1D6FA4':'var(--border2)'};background:${r.oilContam===v?'#EFF6FF':'var(--card)'};font-size:12px;font-weight:700;color:${r.oilContam===v?'#1D6FA4':'var(--text3)'};cursor:pointer">${v}</button>`).join('')}</div>
       </div>
-      <div><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Right Test Kit?</div>
-        <div style="display:flex;gap:5px">${['Yes','No'].map(v=>`<button onclick="wsrCoolSet(${i},'testKit','${v}')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid ${r.testKit===v?'#1D6FA4':'var(--border2)'};background:${r.testKit===v?'#EFF6FF':'var(--card)'};font-size:12px;font-weight:700;color:${r.testKit===v?'#1D6FA4':'var(--text3)'};cursor:pointer">${v}</button>`).join('')}</div>
+      <div style="grid-column:span 2">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Right Test Kit?</div>
+        <div style="display:flex;gap:5px;margin-bottom:6px">${['Yes','No'].map(v=>`<button onclick="wsrCoolSet(${i},'testKit','${v}')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid ${r.testKit===v?WSR_ACC:'var(--border2)'};background:${r.testKit===v?'#EFF6FF':'var(--card)'};font-size:12px;font-weight:700;color:${r.testKit===v?WSR_ACC:'var(--text3)'};cursor:pointer">${v}</button>`).join('')}</div>
+        ${r.testKit==='Yes'?`<div style="display:flex;flex-wrap:wrap;gap:5px">${['Spectrapak 309 (#739466)','Mortoship Nitrite Test Kit (#739414)'].map(k=>`<button onclick="wsrCoolToggleTK(${i},'${k}')" style="padding:4px 9px;border-radius:14px;border:1.5px solid ${(r.testKitNames||[]).includes(k)?WSR_ACC:'var(--border2)'};background:${(r.testKitNames||[]).includes(k)?'#EFF6FF':'var(--card)'};font-size:9.5px;font-weight:600;color:${(r.testKitNames||[]).includes(k)?WSR_ACC:'var(--text3)'};cursor:pointer">${k}</button>`).join('')}</div>`:''}
       </div>
-      <div style="grid-column:span 2"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">Reagent Within Expiry?</div>
-        <div style="display:flex;gap:5px">${['Yes','No'].map(v=>`<button onclick="wsrCoolSet(${i},'reagent','${v}')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid ${r.reagent===v?'#1D6FA4':'var(--border2)'};background:${r.reagent===v?'#EFF6FF':'var(--card)'};font-size:12px;font-weight:700;color:${r.reagent===v?'#1D6FA4':'var(--text3)'};cursor:pointer">${v}</button>`).join('')}</div>
+      <div style="grid-column:span 2">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Reagent Within Expiry?</div>
+        <div style="display:flex;gap:5px;margin-bottom:4px">${['Yes','No'].map(v=>`<button onclick="wsrCoolSet(${i},'reagent','${v}')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid ${r.reagent===v?WSR_ACC:'var(--border2)'};background:${r.reagent===v?'#EFF6FF':'var(--card)'};font-size:12px;font-weight:700;color:${r.reagent===v?WSR_ACC:'var(--text3)'};cursor:pointer">${v}</button>`).join('')}</div>
+        ${r.reagent==='No'?`<div style="font-size:9.5px;color:#991B1B;padding:5px 8px;background:#FEF2F2;border-radius:6px">⚠ Expired reagents → recommended consumables added to report</div>`:''}
       </div>
     </div>
   </div>`;}
@@ -5273,19 +5413,20 @@ function wsrCoolAlerts(){
     const nm=r.name||'Unnamed';
     [['nitrite','Nitrite',L.nitrite],['ph','pH',L.ph],['chloride','Chloride',L.chloride],['conductivity','Conductivity',L.conductivity]].forEach(([fld,lbl,cl])=>{
       if(!r[fld])return;const st=wsrSt(r[fld],cl.lo,cl.hi);
-      if(st==='low')out.push(`<div style="font-size:11px;color:#991B1B;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FEF2F2;border-radius:6px"><b>${nm} — ${lbl} LOW (${r[fld]}):</b> ${wsrCoolMsg(fld,'low')}</div>`);
-      if(st==='high')out.push(`<div style="font-size:11px;color:#92400E;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FFFBEB;border-radius:6px"><b>${nm} — ${lbl} HIGH (${r[fld]}):</b> ${wsrCoolMsg(fld,'high')}</div>`);
+      if(st==='low')out.push(`<div style="font-size:11px;color:#991B1B;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FEF2F2;border-radius:6px"><b>${nm} — ${lbl} LOW (${r[fld]}):</b> ${wsrCoolMsg(fld,'low',r[fld])}</div>`);
+      if(st==='high')out.push(`<div style="font-size:11px;color:#92400E;margin-bottom:5px;line-height:1.5;padding:5px 8px;background:#FFFBEB;border-radius:6px"><b>${nm} — ${lbl} HIGH (${r[fld]}):</b> ${wsrCoolMsg(fld,'high',r[fld])}</div>`);
     });
     if(r.oilContam==='Yes') out.push(`<div style="font-size:11px;color:#991B1B;margin-bottom:5px;padding:5px 8px;background:#FEF2F2;border-radius:6px"><b>${nm} — Oil Contamination detected:</b> Investigate source of oil ingress. Drain and flush system if necessary.</div>`);
   });
   return out.join('');
 }
-function wsrCoolMsg(fld,dir){
+function wsrCoolMsg(fld,dir,rowVal){
+  const extra = fld==='nitrite'&&dir==='low' ? ' '+(wsrRocorDose(rowVal)||'') : '';
   const m={
-    nitrite:{low:'Low Nitrite — increased corrosion and pitting risk. Nitrite forms a passivation film on metal surfaces. Increase Rocor NB Liquid dosage immediately.',high:'High Nitrite — over-concentration. Stop chemical dosage and monitor until within target range.'},
-    ph:{low:'Low pH — corrosion risk. Increase Rocor NB Liquid dosage.',high:'High pH — scale and deposit risk. Reduce chemical dosage and increase blowdown.'},
-    chloride:{low:'',high:'High Chloride — seawater contamination suspected. Ensure make-up water contains <5 ppm Cl. Keep nitrite near upper limit until resolved.'},
-    conductivity:{low:'Low Conductivity — system may be diluted, risk of insufficient inhibitor concentration.',high:'High Conductivity — high TDS. Check for contamination and consider partial drain-down.'}
+    nitrite:{low:'Low Nitrite — corrosion and pitting risk. Increase Rocor NB Liquid dosage.'+extra,high:'High Nitrite — over-concentration. Stop dosage and monitor until within range (1000–3000 ppm).'},
+    ph:{low:'Low pH — corrosion risk. Increase Rocor NB Liquid dosage.',high:'High pH — scale risk. Reduce dosage and increase blowdown.'},
+    chloride:{low:'',high:'High Chloride — seawater contamination suspected. Make-up water should contain <5 ppm Cl. Keep nitrite near upper limit until resolved.'},
+    conductivity:{low:'Low Conductivity — risk of insufficient inhibitor concentration.',high:'High Conductivity — check for contamination. Consider partial drain-down.'}
   };
   return (m[fld]&&m[fld][dir])||'Check system and adjust dosage.';
 }
@@ -5299,7 +5440,7 @@ function wsrStepWaterProd(){
   <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Water Production System</div>
   ${wsrLbl('System Type',0)}
   <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
-    ${['Evaporator','RO System','None'].map(t=>`
+    ${['Evaporator','RO System','RO + Evaporator','None'].map(t=>`
       <button onclick="wsrWPType('${t}')" style="width:100%;padding:13px 16px;border-radius:11px;border:2px solid ${W.sysType===t?WSR_ACC:'var(--border2)'};background:${W.sysType===t?'#EFF6FF':'var(--card)'};font-size:13px;font-weight:700;color:${W.sysType===t?WSR_ACC:'var(--text2)'};cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px">
         <div style="width:20px;height:20px;border-radius:50%;border:2px solid ${W.sysType===t?WSR_ACC:'var(--border2)'};background:${W.sysType===t?WSR_ACC:'transparent'};display:grid;place-items:center;flex-shrink:0">
           ${W.sysType===t?'<div style="width:8px;height:8px;border-radius:50%;background:#fff"></div>':''}
@@ -5307,7 +5448,7 @@ function wsrStepWaterProd(){
         ${t}
       </button>`).join('')}
   </div>
-  ${W.sysType==='RO System'?`
+  ${(W.sysType==='RO System'||W.sysType==='RO + Evaporator')?`
     ${wsrLbl('RO System Maker')}
     <div style="background:#EFF6FF;border:2px solid ${WSR_ACC};border-radius:12px;padding:14px;margin-bottom:10px">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:${WSR_ACC};margin-bottom:8px">Select RO System Maker</div>
@@ -5334,7 +5475,13 @@ function wsrStepWaterProd(){
     `)}`:''}
   ${wsrNxtBtn('Continue to Potable Water','wsrNext()')}${wsrSkipBtn()}`;}
 
-function wsrWPType(v){WSR.waterprod.sysType=v;wsrRefresh();}
+function wsrWPType(v){
+  if(!WSR.waterprod.sysTypes) WSR.waterprod.sysTypes=[];
+  const idx=WSR.waterprod.sysTypes.indexOf(v);
+  if(idx>=0) WSR.waterprod.sysTypes.splice(idx,1); else WSR.waterprod.sysTypes.push(v);
+  WSR.waterprod.sysType=WSR.waterprod.sysTypes.join('+');
+  wsrRefresh();
+}
 function wsrWPProd(p){wsrToggleArr(WSR.waterprod.prods,p);wsrRefresh();}
 
 // ── STEP 5: POTABLE WATER ─────────────────────────────────────────────────────
@@ -5470,7 +5617,7 @@ function wsrStepBallast(){
   `)}
   ${wsrCard(`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Comments</div>
     <textarea onblur="WSR.ballast.comments=this.value" placeholder="Any observations..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:65px;resize:none">${B.comments||''}</textarea>`)}
-  ${wsrNxtBtn('Continue to Equipment Photos','wsrNext()')}${wsrSkipBtn()}`;}
+  ${wsrNxtBtn('Continue to Wastewater','wsrNext()')}${wsrSkipBtn()}`;}
 
 function wsrStepWastewater(){
   const WW=WSR.wastewater;
@@ -5481,7 +5628,7 @@ function wsrStepWastewater(){
   ${wsrMultiChips(wwChems,(WW.prods||[]),'wsrWWProd')}
   ${wsrCard('<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Others (free text)</div><input value="'+( WW.wwOther||'')+ '" placeholder="Other wastewater chemical..." onblur="WSR.wastewater.wwOther=this.value" style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box">')}
   ${wsrCard('<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Comments</div><textarea onblur="WSR.wastewater.comments=this.value" placeholder="Bilge observations, dosing notes..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:65px;resize:none">'+(WW.comments||'')+'</textarea>')}
-  ${wsrNxtBtn('Continue to Equipment Photos','wsrNext()')}${wsrSkipBtn()}`;
+  ${wsrNxtBtn('Continue to Wastewater','wsrNext()')}${wsrSkipBtn()}`;
 }
 function wsrWWProd(p){wsrToggleArr(WSR.wastewater.prods,p);wsrRefresh();}
 
@@ -5671,21 +5818,114 @@ function wsrCollectAllProds(){
 // ── STEP 11: COMMENTS ─────────────────────────────────────────────────────────
 function wsrStepComments(){
   const ba=wsrBoilerAlerts(); const ca=wsrCoolAlerts();
+  const rec=wsrCollectRecommendedChems();
+  const kits=rec.kitConsumables; const kitKeys=Object.keys(kits);
+  if(!WSR.selectedConsumables) WSR.selectedConsumables={};
   return `
-  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Comments & General Notes</div>
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Comments & Notes</div>
   ${(ba||ca)?`<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 12px;margin-bottom:12px">
-    <div style="font-size:10px;font-weight:700;color:#991B1B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">⚠ Auto-generated alerts from all readings</div>
+    <div style="font-size:10px;font-weight:700;color:#991B1B;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">⚠ System Alerts</div>
     ${ba}${ca}
+  </div>`:''}
+  ${kitKeys.length?`<div style="background:#FFF8E1;border:1px solid #F9A825;border-radius:10px;padding:10px 12px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:700;color:#7B6000;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">📦 Select Reagents to Recommend (Expired Kits)</div>
+    ${kitKeys.map(kitName=>`<div style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;color:#003057;margin-bottom:6px;padding:5px 8px;background:rgba(255,255,255,.6);border-radius:6px">${kitName}</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        ${(WSR_CONSUMABLES[kitName]||[]).map(c=>{
+          const sel=!!(WSR.selectedConsumables&&WSR.selectedConsumables[kitName]&&WSR.selectedConsumables[kitName].includes(c.p));
+          const bc=sel?WSR_ACC:'var(--border2)'; const bg=sel?WSR_ACC:'var(--bg3)'; const chk=sel?'<i class="ti ti-check" style="font-size:10px;color:#fff"></i>':'';
+          return '<div onclick="wsrToggleConsumable(\''+kitName+'\',\''+c.p+'\')" style="display:flex;align-items:flex-start;gap:8px;padding:7px 9px;background:var(--card);border:1.5px solid '+bc+';border-radius:8px;cursor:pointer">'
+            +'<div style="width:18px;height:18px;border-radius:4px;background:'+bg+';border:1.5px solid '+bc+';display:grid;place-items:center;flex-shrink:0;margin-top:1px">'+chk+'</div>'
+            +'<div><div style="font-size:11px;font-weight:600;color:var(--text)">'+c.name+'</div>'
+            +'<div style="font-size:10px;color:var(--text3);margin-top:1px">'+c.desc+'</div></div></div>';
+        }).join('')}      </div>
+    </div>`).join('')}
+  </div>`:''}
+  ${rec.gls.length?`<div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:10px 12px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:700;color:#1E40AF;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">🔬 GLS Water Analysis Recommended</div>
+    ${rec.gls.map(g=>`<div style="font-size:11px;color:#1E40AF;padding:4px 8px;background:rgba(255,255,255,.6);border-radius:6px;margin-bottom:4px">• ${g} — discoloured sample, send for GLS lab analysis</div>`).join('')}
   </div>`:''}
   ${wsrCard(`<div style="font-size:10px;color:var(--text3);margin-bottom:4px">General Notes & Recommendations</div>
     <textarea id="wsr-gen-comment" onblur="WSR.comments.general=this.value"
       placeholder="Test kit condition, items handed over, training provided, general observations..."
       style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:100px;resize:none">${WSR.comments.general||''}</textarea>`)}
-  ${wsrNxtBtn('Preview & Generate PDF','wsrCommentsNext()')}`;
+  ${wsrNxtBtn('Continue to Signatures','wsrCommentsNext()')}`;
+}
+
+function wsrToggleConsumable(kitName, p){
+  if(!WSR.selectedConsumables) WSR.selectedConsumables={};
+  if(!WSR.selectedConsumables[kitName]) WSR.selectedConsumables[kitName]=[];
+  const idx=WSR.selectedConsumables[kitName].indexOf(p);
+  if(idx>=0) WSR.selectedConsumables[kitName].splice(idx,1);
+  else WSR.selectedConsumables[kitName].push(p);
+  wsrRefresh();
 }
 function wsrCommentsNext(){const el=document.getElementById('wsr-gen-comment');if(el)WSR.comments.general=el.value;wsrNext();}
 
 // ── STEP 12: PREVIEW ─────────────────────────────────────────────────────────
+function wsrStepSignature(){
+  return `
+  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Signatures</div>
+  <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:10px 12px;font-size:11px;color:#1E40AF;margin-bottom:14px;line-height:1.5">
+    Both the WSS Service Engineer and the Chief Engineer must sign before generating the final report.
+  </div>
+  ${wsrCard(`
+    <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:10px">WSS Service Engineer: <span style="color:#1D6FA4">${WSR.pse||'—'}</span></div>
+    <div style="border:2px solid ${WSR.signatures.pse?'#0B6E4F':'var(--border2)'};border-radius:10px;overflow:hidden;margin-bottom:8px;background:${WSR.signatures.pse?'#F0FFF4':'var(--bg3)'}">
+      <canvas id="sig-pse" width="350" height="130" style="width:100%;height:130px;display:block;touch-action:none;cursor:crosshair"></canvas>
+    </div>
+    ${WSR.signatures.pse?'<div style="font-size:10px;color:#0B6E4F;font-weight:600;margin-bottom:6px">✓ Signature captured</div>':'<div style="font-size:10px;color:var(--text3);margin-bottom:6px">Sign above with your finger</div>'}
+    <div style="display:flex;gap:8px">
+      <button onclick="wsrCaptureSig('pse')" style="flex:1;padding:9px;background:#0B6E4F;border:none;border-radius:9px;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Save PSE Signature</button>
+      <button onclick="wsrClearSig('pse')" style="padding:9px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:9px;color:var(--text3);font-size:12px;cursor:pointer">Clear</button>
+    </div>
+  `)}
+  ${wsrCard(`
+    <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:10px">Chief Engineer: <span style="color:#1D6FA4">${WSR.chiefEngineer||'—'}</span></div>
+    <div style="border:2px solid ${WSR.signatures.chiefEngineer?'#0B6E4F':'var(--border2)'};border-radius:10px;overflow:hidden;margin-bottom:8px;background:${WSR.signatures.chiefEngineer?'#F0FFF4':'var(--bg3)'}">
+      <canvas id="sig-ce" width="350" height="130" style="width:100%;height:130px;display:block;touch-action:none;cursor:crosshair"></canvas>
+    </div>
+    ${WSR.signatures.chiefEngineer?'<div style="font-size:10px;color:#0B6E4F;font-weight:600;margin-bottom:6px">✓ Signature captured</div>':'<div style="font-size:10px;color:var(--text3);margin-bottom:6px">Sign above with your finger</div>'}
+    <div style="display:flex;gap:8px">
+      <button onclick="wsrCaptureSig('ce')" style="flex:1;padding:9px;background:#0B6E4F;border:none;border-radius:9px;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Save CE Signature</button>
+      <button onclick="wsrClearSig('ce')" style="padding:9px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:9px;color:var(--text3);font-size:12px;cursor:pointer">Clear</button>
+    </div>
+  `)}
+  ${wsrNxtBtn('Continue to Preview & Export','wsrNext()')}`;
+}
+
+function wsrInitSigCanvas(id, sigKey){
+  const canvas=document.getElementById(id);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  ctx.strokeStyle='#003057'; ctx.lineWidth=2; ctx.lineCap='round'; ctx.lineJoin='round';
+  let drawing=false;
+  function pt(e){const r=canvas.getBoundingClientRect();const cl=e.touches?e.touches[0]:e;return{x:(cl.clientX-r.left)*(canvas.width/r.width),y:(cl.clientY-r.top)*(canvas.height/r.height)};}
+  canvas.onmousedown=canvas.ontouchstart=e=>{e.preventDefault();drawing=true;const p=pt(e);ctx.beginPath();ctx.moveTo(p.x,p.y);};
+  canvas.onmousemove=canvas.ontouchmove=e=>{e.preventDefault();if(!drawing)return;const p=pt(e);ctx.lineTo(p.x,p.y);ctx.stroke();};
+  canvas.onmouseup=canvas.ontouchend=()=>drawing=false;
+}
+
+function wsrCaptureSig(who){
+  const id=who==='pse'?'sig-pse':'sig-ce';
+  const canvas=document.getElementById(id);
+  if(!canvas)return;
+  const data=canvas.toDataURL('image/png');
+  if(who==='pse') WSR.signatures.pse=data;
+  else WSR.signatures.chiefEngineer=data;
+  wsrRefresh();
+}
+
+function wsrClearSig(who){
+  const id=who==='pse'?'sig-pse':'sig-ce';
+  const canvas=document.getElementById(id);
+  if(canvas)canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+  if(who==='pse') WSR.signatures.pse=null;
+  else WSR.signatures.chiefEngineer=null;
+  wsrRefresh();
+}
+
 function wsrStepPreview(){
   const bRows=WSR.boiler.filter(r=>r.name||r.ph||r.pAlk||r.chloride||r.deha||r.conductivity);
   const cRows=WSR.cooling.filter(r=>r.name||r.nitrite||r.ph||r.chloride||r.conductivity);
@@ -5980,6 +6220,47 @@ ${WSR.comments.general?`<div class="section">
   <div style="font-size:9.5px;color:#374151;line-height:1.7;white-space:pre-wrap">${WSR.comments.general}</div>
 </div>`:''}
 
+${(()=>{
+  const rec=wsrCollectRecommendedChems();
+  const gls=rec.gls; const kits=rec.kitConsumables; const kitKeys=Object.keys(kits);
+  const selC=WSR.selectedConsumables||{};
+  // Build flat list of selected consumables across all kits
+  const allConsumables=[];
+  kitKeys.forEach(kitName=>{
+    const kitItems=WSR_CONSUMABLES[kitName]||[];
+    const selected=selC[kitName]||[];
+    const items=selected.length?kitItems.filter(c=>selected.includes(c.p)):kitItems;
+    items.forEach(c=>allConsumables.push({kit:kitName,name:c.name,desc:c.desc}));
+  });
+  if(!gls.length&&!allConsumables.length) return '';
+  return '<div class="section"><div class="sec-hdr"><div class="sec-icon">REC</div><div class="sec-title">Recommended Products & Services</div></div>'
+    +(allConsumables.length?'<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#003057;margin-bottom:6px;border-bottom:1px solid #DBEAFE;padding-bottom:3px">Test Kit Consumables — Reagents to Replenish</div>'
+    +'<table><tr><th>Test Kit</th><th>Consumable / Reagent</th><th>Notes</th></tr>'
+    +allConsumables.map(c=>'<tr><td style="font-size:9px;color:#6B7280">'+c.kit+'</td><td style="font-weight:600">'+c.name+'</td><td style="font-size:9px;color:#374151">'+c.desc+'</td></tr>').join('')
+    +'</table></div>':'')
+    +(gls.length?'<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#003057;margin-bottom:6px;border-bottom:1px solid #DBEAFE;padding-bottom:3px">WSS Global Lab Service (GLS) — Discoloured Samples</div>'
+    +'<table><tr><th>System / Sample</th><th>Recommendation</th></tr>'
+    +gls.map(g=>'<tr><td style="font-weight:600">'+g+'</td><td style="color:#DC2626;font-size:9px">Discoloured — send water sample for GLS laboratory analysis</td></tr>').join('')
+    +'</table><div style="margin-top:6px;padding:7px 10px;background:#FEF2F2;border-radius:6px;font-size:9px;color:#991B1B">Contact your WSS representative or GLS team to arrange water sample laboratory analysis.</div></div>':'')
+    +'</div>';
+})()}
+${WSR.signatures&&(WSR.signatures.pse||WSR.signatures.chiefEngineer)?`<div class="section">
+  <div class="sec-hdr"><div class="sec-icon">✍</div><div class="sec-title">Signatures</div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px">
+    <div style="text-align:center">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B7280;margin-bottom:6px">WSS Service Engineer</div>
+      ${WSR.signatures.pse?`<img src="${WSR.signatures.pse}" style="width:100%;max-height:80px;object-fit:contain;border-bottom:1px solid #003057;display:block">`:'<div style="height:80px;border-bottom:1px solid #003057"></div>'}
+      <div style="font-size:10px;font-weight:700;color:#003057;margin-top:4px">${WSR.pse||'—'}</div>
+      <div style="font-size:9px;color:#6B7280">${WSR.date}</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B7280;margin-bottom:6px">Chief Engineer</div>
+      ${WSR.signatures.chiefEngineer?`<img src="${WSR.signatures.chiefEngineer}" style="width:100%;max-height:80px;object-fit:contain;border-bottom:1px solid #003057;display:block">`:'<div style="height:80px;border-bottom:1px solid #003057"></div>'}
+      <div style="font-size:10px;font-weight:700;color:#003057;margin-top:4px">${WSR.chiefEngineer||'—'}</div>
+      <div style="font-size:9px;color:#6B7280">${WSR.vessel}</div>
+    </div>
+  </div>
+</div>`:''}
 <div class="disclaimer">
   The test results and recommendations provided by WSS are based solely on the sample(s) provided by the Customer. WSS accepts no responsibility for the accuracy of results if sampling, handling, or transport was not performed correctly. All samples are analyzed as received, and results apply only to those specific samples under the tested conditions. WSS shall not be liable for any loss, damage, or third-party claims arising from the use of these results or recommendations.
 </div>
@@ -6150,6 +6431,20 @@ function wsrEditReport(id){
   rp('wsr',wsrPage());
 }
 function wsrRePrintReport(id){const rep=(WSR_REPORTS||[]).find(r=>r.id===id);if(!rep)return;const url=URL.createObjectURL(new Blob([rep.html],{type:'text/html'}));const w=window.open(url,'_blank');if(w)w.onload=()=>setTimeout(()=>w.print(),500);}
+
+
+// ── NBI NAMED TOGGLE HANDLERS ─────────────────────────────────────────────────
+function nbiO_bp(v){NBI.boilerPressure=v;nbiRefresh();}
+function nbiO_bf(v){NBI.boilerFeedwater=v;nbiRefresh();}
+function nbiO_bc(v){NBI.boilerCount=v;nbiRefresh();}
+function nbiO_ca(v){NBI.coolingAl=v;nbiRefresh();}
+function nbiO_type(v){NBI.type=v;nbiRefresh();}
+function nbiO_dwt(v){NBI.dwt=v;nbiRefresh();}
+function nbiO_rv(v){NBI.ropeVessel=v;nbiRefresh();}
+function nbiO_rd(v){NBI.ropeDwt=v;nbiRefresh();}
+function nbiO_ws(v){NBI.weldingSize=v;nbiRefresh();}
+function nbiO_ct(v){NBI.cargoType=v;nbiRefresh();}
+function nbiO_rt(v){NBI.refrigType=v;nbiRefresh();}
 
 
 // ── INIT ───────────────────────────────────────────────────────────────────────
