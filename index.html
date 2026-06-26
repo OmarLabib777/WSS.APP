@@ -4892,7 +4892,7 @@ function hWSR() {
     waterprod:{sysType:'', roMaker:'', roMakerOther:'', capacity:'', method:'', consumption:'', comments:'', prods:[]},
     potable:{prods:[], freeText:'', dosingMethod:'', corrosionShield:false, lastCartridge:'', discoloration:false, discolorPhoto:null, comments:''},
     seawater:{prods:[], swOther:'', dosingMethod:'', comments:''},
-    waterproof:{inUse:'', version:'', comments:''},
+    waterproof:{inUse:'', version:'', comments:'', lastMonthChecked:'', reportComments:''},
     ballast:{maker:'', sysType:'', chemicals:[], ballastOther:'', chemType:'', dosingUnit:false, comments:''},
     wastewater:{prods:[], wwOther:'', comments:''},
     photos:[],
@@ -5625,8 +5625,13 @@ function wsrStepWaterproof(){
     ${WP.inUse==='Yes'?`
       ${wsrLbl('Version')}
       <div style="display:flex;gap:6px;margin-bottom:10px">${['WP 3.0 (Online)','WP 2.x (Desktop)'].map(v=>`<button onclick="WSR.waterproof.version='${v}';wsrRefresh()" style="flex:1;padding:9px;border-radius:9px;border:1.5px solid ${WP.version===v?WSR_ACC:'var(--border2)'};background:${WP.version===v?'#E8EEF8':'var(--card)'};font-size:11px;font-weight:600;color:${WP.version===v?WSR_ACC:'var(--text3)'};cursor:pointer">${v}</button>`).join('')}</div>
-      ${WP.version==='WP 2.x (Desktop)'?`<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:9px;padding:9px 12px;font-size:11px;color:#991B1B;line-height:1.6;margin-bottom:8px">⚠ <b>Action Required:</b> Waterproof Desktop (WP 2.x) will be phased out end of 2026. Vessel should migrate to <b>WP 3.0 Online</b>. This will be highlighted on the report.</div>`:''}
-      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Comments</div>
+      ${WP.version==='WP 2.x (Desktop)'?`<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:9px;padding:9px 12px;font-size:11px;color:#991B1B;line-height:1.6;margin-bottom:10px">⚠ <b>Action Required:</b> Waterproof Desktop (WP 2.x) will be phased out end of 2026. Vessel should migrate to <b>WP 3.0 Online</b>. This will be highlighted on the report.</div>`:''}
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-weight:600">Latest Month Checked in Waterproof</div>
+      <input type="month" value="${WP.lastMonthChecked||''}" onblur="WSR.waterproof.lastMonthChecked=this.value"
+        style="width:100%;padding:9px 11px;border:1.5px solid var(--border2);border-radius:9px;font-size:13px;background:var(--card);color:var(--text);box-sizing:border-box;margin-bottom:10px">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-weight:600">Comments on Latest Report Checked</div>
+      <textarea onblur="WSR.waterproof.reportComments=this.value" placeholder="e.g. All values within limits in last month log, Nitrite was flagged as low in March report, Training provided on correct data entry..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:70px;resize:none;margin-bottom:10px">${WP.reportComments||''}</textarea>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px;font-weight:600">General Comments</div>
       <textarea onblur="WSR.waterproof.comments=this.value" placeholder="Version details, any issues, training provided..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:65px;resize:none">${WP.comments||''}</textarea>`:''}
   `)}
   ${wsrNxtBtn('Continue to Ballast Water','wsrNext()')}`;}
@@ -5671,7 +5676,7 @@ function wsrStepWastewater(){
   ${wsrMultiChips(wwChems,(WW.prods||[]),'wsrWWProd')}
   ${wsrCard('<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Others (free text)</div><input value="'+( WW.wwOther||'')+ '" placeholder="Other wastewater chemical..." onblur="WSR.wastewater.wwOther=this.value" style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box">')}
   ${wsrCard('<div style="font-size:10px;color:var(--text3);margin-bottom:4px">Comments</div><textarea onblur="WSR.wastewater.comments=this.value" placeholder="Bilge observations, dosing notes..." style="width:100%;padding:8px 10px;border:1.5px solid var(--border2);border-radius:8px;font-size:12px;background:var(--card);color:var(--text);box-sizing:border-box;height:65px;resize:none">'+(WW.comments||'')+'</textarea>')}
-  ${wsrNxtBtn('Continue to Wastewater','wsrNext()')}${wsrSkipBtn()}`;
+  ${wsrNxtBtn('Continue to Equipment Photos','wsrNext()')}${wsrSkipBtn()}`;
 }
 function wsrWWProd(p){wsrToggleArr(WSR.wastewater.prods,p);wsrRefresh();}
 
@@ -6218,7 +6223,9 @@ ${S.prods&&S.prods.length||S.swOther?`<div class="section">
   <div class="info-grid">
     <div class="ig"><div class="il">In Use</div><div class="iv">${WP.inUse||'Not specified'}</div></div>
     ${WP.inUse==='Yes'&&WP.version?`<div class="ig"><div class="il">Version</div><div class="iv" style="${WP.version==='WP 2.x (Desktop)'?'color:#DC2626;font-weight:700':''}">${WP.version}</div></div>`:''}
-    ${WP.comments?`<div class="ig"><div class="il">Notes</div><div class="iv">${WP.comments}</div></div>`:''}
+    ${WP.lastMonthChecked?`<div class="ig"><div class="il">Latest Month Checked</div><div class="iv">${WP.lastMonthChecked}</div></div>`:''}
+    ${WP.reportComments?`<div class="ig"><div class="il">Report Comments</div><div class="iv">${WP.reportComments}</div></div>`:''}
+    ${WP.comments?`<div class="ig"><div class="il">General Notes</div><div class="iv">${WP.comments}</div></div>`:''}
   </div>
   ${WP.version==='WP 2.x (Desktop)'?`<div style="margin-top:8px;padding:8px 12px;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:8px;font-size:10px;color:#991B1B;line-height:1.6"><b>⚠ PRIORITY ACTION:</b> This vessel is using Waterproof Desktop (WP 2.x) which will be phased out at the end of 2026. The vessel must migrate to <b>Waterproof Online (WP 3.0)</b>. Please contact your WSS representative to arrange the upgrade.</div>`:''}
 </div>
